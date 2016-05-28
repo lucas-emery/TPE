@@ -1,3 +1,5 @@
+![ITBA](http://static.sabf.org.ar/Restyling/itba.png)
+
 #Trabajo Práctico Especial de Programación Imperativa (72.31)
 ## Primer Cuatrimestre de 2016
 ### Grupo N°2
