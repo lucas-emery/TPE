@@ -23,6 +23,16 @@ IDEA1
       }
     }
 
+    void render(char** tablero, int dimx, int dimy) {
+      loop(todoeltablero) {
+        modo caca:
+          imprime las A y las Z bien villa
+
+        modo l33t m4dn3$$:
+          le agregamos color //no es complicated
+      }
+    }
+
   blobsback.c
     movimiento pedirMov(int player){
       command = null; //WIP
@@ -61,15 +71,5 @@ IDEA1
           blobcount[player]++;
           blobcount[otro]--;
         }
-      }
-    }
-
-    void render(char** tablero, int dimx, int dimy) {
-      loop(todoeltablero) {
-        modo caca:
-          imprime las A y las Z bien villa
-
-        modo l33t m4dn3$$:
-          le agregamos color //no es complicated
       }
     }
