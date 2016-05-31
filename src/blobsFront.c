@@ -4,6 +4,7 @@
 #define DIMX 5
 #define DIMY 5
 
+void init(typeBoard * board);
 typedef struct{
 
 int h;
@@ -16,18 +17,33 @@ char **get;
 int
 main(void){
      
-	typeBoard tableroCabeza;
+	typeBoard board;
 
 	printf("La matriz:\n");
-	tableroCabeza.h = getnum("Ingrese altura:\n");
-	tableroCabeza.w = getnum("Ingrese ancho:\n");
-	render(&tableroCabeza);
+	board.h = getnum("Ingrese altura:\n");
+	board.w = getnum("Ingrese ancho:\n");
+	render(&board);
 
 }
 
 
 void render(typeBoard* board){
+	
 	int i,j;
+	for(i=0;i < board->h;i++){
+		for(j=0;j < board->w;j++)
+		{
+			printf("")
+		}
+	}
+}
 
+void init(typeBoard * board){ //mover al back
+	int* temp;
 
+	board->get = malloc(board->h * sizeof(int*));
+	temp = malloc(board->h * board->w * sizeof(int));
+	for (int i = 0; i < board->h; i++) {
+  		board->get[i] = temp + (i * board->w);   
+	}
 }
