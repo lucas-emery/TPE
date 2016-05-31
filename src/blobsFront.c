@@ -4,19 +4,10 @@
 #define DIMX 5
 #define DIMY 5
 
-void init(typeBoard * board);
-typedef struct{
-
-int h;
-int w;
-char **get;
-
-}typeBoard;(
-
 
 int
 main(void){
-     
+
 	typeBoard board;
 
 	printf("La matriz:\n");
@@ -28,7 +19,7 @@ main(void){
 
 
 void render(typeBoard* board){
-	
+
 	int i,j;
 	for(i=0;i < board->h;i++){
 		for(j=0;j < board->w;j++)
@@ -44,6 +35,6 @@ void init(typeBoard * board){ //mover al back
 	board->get = malloc(board->h * sizeof(int*));
 	temp = malloc(board->h * board->w * sizeof(int));
 	for (int i = 0; i < board->h; i++) {
-  		board->get[i] = temp + (i * board->w);   
+  		board->get[i] = temp + (i * board->w);
 	}
 }
