@@ -37,7 +37,7 @@ void render(typeBoard* board){
 		for(j=0;j < board->w;j++)
 		{
 			switch(board->get[i][j].owner){
-				
+
 				case 0:
 				printf("| ");
 				break;
@@ -59,7 +59,7 @@ void render(typeBoard* board){
 void init(typeBoard * board){ //mover al back
 	typeBlob* temp;
 	int i;
-	board->get = malloc(board->h * sizeof(typeBlob*));
+	board->get = (typeBlob**) malloc(board->h * sizeof(typeBlob*));
 	temp = (typeBlob*) malloc(board->h * board->w * sizeof(typeBlob));
 	for (i = 0; i < board->h; i++) {
   		board->get[i] = temp + (i * board->w);

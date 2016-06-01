@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "blobsBack.h"
 
@@ -15,7 +16,24 @@ int canMove(int player, typeBoard* board) {
 }
 
 char* getCommand(typeCommand* command) {
+  char input;
+  int state = 0;
+  int i = 0, j = 0;
 
+  while((input = getchar()) != '\n') {
+    switch(state) {
+      case 0:
+        if(input == '[') state = 1;
+        else if(input == 's') state = 2;
+        else if(input == 'q') state = 3;
+        else state = 4;
+        i++;
+        break;
+
+      case 1:
+        if(input >= '0' && input <= '9');
+    }
+  }
 }
 
 int isInside(int x, int y, int w, int h) {
