@@ -12,7 +12,7 @@ void fill(typeBoard*board);
 int main(int argc, char **argv){
 	typeBoard board;
 
-	if(argc > 1 && *argv[1] == 'd') {
+	//if(argc > 1 && *argv[1] == 'd') {
 		printf("La matriz:\n");
 		board.h = getint("Ingrese altura:\n");
 		board.w = getint("Ingrese ancho:\n");
@@ -20,53 +20,61 @@ int main(int argc, char **argv){
 		fill(&board);
 
 		render(&board);
-	}
-	else {
+	//}
+	//else {
 		//MAIN POSTA
-		gameState state = MENU;
+		gameState state = GAME;
 		//typeBoard board; DECLARED BEFORE IF STATEMENT
 		char* filename;
 		int player;
-		switch(state) {
-			case MENU:
-				break;
+		while(state != QUIT) {
+			switch(state) {
+				case MENU:
+					printf("This is a menu");
+					getchar();
+					break;
 
-			case GAME:
-				player = rand()%2; //Just for testing
-				//Generate board if not loaded (wip)
-				char* retValue;
-				typeCommand command;
-				while(state == GAME) {
-					if(canMove(player, &board)) {
-						do {
-							retValue = getCommand(&command);
-							if(retValue != NULL) {
-								if(*retValue == EOF) //PLAYER QUIT
-									state = MENU;
-								else {
-									state = SAVE;
-									filename = retValue;
+				case GAME:
+					player = 1; //Just for testing
+					//Generate board if not loaded (wip)
+					char* retValue;
+					typeCommand command;
+					while(state == GAME) {
+						if(canMove(player, &board)) {
+							do {
+								retValue = getCommand(&command);
+								if(retValue != NULL) {
+									if(*retValue == EOF) //PLAYER QUIT
+										state = MENU;
+									else {
+										state = SAVE;
+										filename = retValue;
+									}
 								}
-							}
-						} while(!validCommand(&command, &board, player));
+							} while(state == GAME && !validCommand(&command, &board, player));
+							printf("SX:%d SY:%d TX:%d TY:%d\n", command.source.x, command.source.y, command.target.x, command.target.y);
+						}
+						else
+							state = END;//Someone won
 					}
-					else
-						state = END;//Someone won
-				}
-				break;
+					break;
 
-			case SAVE:
-				break;
+				case SAVE:
+					printf("Game %s saved!", filename);
+					getchar();
+					state = MENU;
+					break;
 
-			case LOAD:
-				break;
+				case LOAD:
+					break;
 
-			case END:
-				break;
+				case END:
+					break;
 
-			//Other cases
+				//Other cases
+			}
 		}
-	}
+	//}
 
 	return 0;
 }
@@ -88,16 +96,18 @@ void render(typeBoard* board){
 			switch(board->get[i][j].owner){
 
 				case 0:
-				printf("| ");
-				break;
+					printf("| ");
+					break;
 
 				case 1:
-				printf("|\x1b[31mO\x1b[0m");
-				break;
+					//printf("|\x1b[31mO\x1b[0m");
+					printf("|A");
+					break;
 
 				case 2:
-				printf("|\x1b[36mO\x1b[0m");
-				break;
+					//printf("|\x1b[36mO\x1b[0m");
+					printf("|Z");
+					break;
 			}
 		}
 

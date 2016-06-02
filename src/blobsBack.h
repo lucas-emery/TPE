@@ -1,4 +1,4 @@
-typedef enum {MENU, GAME, SAVE, LOAD, END} gameState;
+typedef enum {MENU, GAME, SAVE, LOAD, END, QUIT} gameState;
 
 typedef struct {
   int x;

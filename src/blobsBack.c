@@ -108,10 +108,11 @@ char* getCommand(typeCommand* command) {
         case 3:
           if(input == pattern[i]) {
             i++;
-            if(pattern[i] == '\0')
+            if(pattern[i] == '\0') {
               output = (char*) malloc(sizeof(char));
               *output = EOF;
               valid = 1;
+            }
           }
           else {
             valid = 0;
@@ -132,14 +133,14 @@ char* getCommand(typeCommand* command) {
 
   if(output != NULL && *output == EOF) {
     printf("Do you want to save before quitting?(y/n): ");
-    while(1) {
+    valid = 0;
+    while(!valid) {
       input = getchar();
       if(getchar() == '\n') {
         if(input == 'y') {
-          printf("Enter filename(max 15): ");
           output = (char*) realloc(output, 16*sizeof(char)); //Extra space for \0
-          valid = 0;
           while(!valid) {
+            printf("Enter filename(max 15): ");
             length = 0;
             while(length < 15 && (input = getchar()) != '\n') {
               output[length] = input;
@@ -148,17 +149,24 @@ char* getCommand(typeCommand* command) {
             if(length <= 15 && input == '\n')
               valid = 1;
             else {
-              printf("Filename too long!");
+              printf("Filename too long!\n");
               while(getchar() != '\n'); //EMPTY BUFFER
             }
           }
-          output[length] = '\0';
         }
+        else if(input == 'n')
+          valid = 1;
       }
       else
         while(getchar() != '\n');//EMPTY BUFFER
+
+      if(!valid)
+        printf("Invalid answer, enter 'y' for yes or 'n' for no: ");
     }
   }
+
+  if(output != NULL && *output != EOF)
+    output[length] = '\0';
 
   return output;
 }
