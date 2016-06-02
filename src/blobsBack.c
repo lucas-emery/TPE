@@ -19,12 +19,19 @@ char* getCommand(typeCommand* command) {
   char input;
   const char* pattern;
   char* output;
-  int state = 0;
-  int  valid = 0, i = 0, length = 0;
+  int state;
+  int  valid = 0, i, length;
 
   while(!valid) {
     output = NULL;
-    *command = {{-1,-1},{-1,-1}}; //WIP INIT
+    state = 0;
+    i = 0;
+    length = 0;
+    command->source.x = -1;
+    command->source.y = -1;
+    command->target.x = -1;
+    command->target.y = -1;
+
     while((input = getchar()) != '\n') {
       switch(state) {
         case 0:
@@ -41,27 +48,27 @@ char* getCommand(typeCommand* command) {
             pattern = "quit";
           }
           else
-            state = 4; //invalid
+            state = 4; //invalid command
           i++;
           break;
 
         case 1:
           if(pattern[i] == '#') {
-            if(input >= '0' && input <= '9') { //XY o YX ???
-              if(command->source.x == -1) command->source.x = input-'0';
-              else if(command->source.y == -1) command->source.y = input-'0';
-              else if(command->target.x == -1) command->target.x = input-'0';
+            if(input >= '0' && input <= '9') {
+              if(command->source.y == -1) command->source.y = input-'0';
+              else if(command->source.x == -1) command->source.x = input-'0';
               else if(command->target.y == -1) command->target.y = input-'0';
+              else if(command->target.x == -1) command->target.x = input-'0';
             }
             else
               state = 4;
           }
           else if(pattern[i] == '*') {
             if(input >= '0' && input <= '9') {
-              if(command->source.x < 10) command->source.x = command->source.x*10 + (input-'0');
-              else if(command->source.y < 10) command->source.y = command->source.y*10 + (input-'0');
-              else if(command->target.x < 10) command->target.x = command->target.x*10 + (input-'0');
+              if(command->source.y < 10) command->source.y = command->source.y*10 + (input-'0');
+              else if(command->source.x < 10) command->source.x = command->source.x*10 + (input-'0');
               else if(command->target.y < 10) command->target.y = command->target.y*10 + (input-'0');
+              else if(command->target.x < 10) command->target.x = command->target.x*10 + (input-'0');
             }
             else
               i++;
@@ -88,7 +95,7 @@ char* getCommand(typeCommand* command) {
             }
             else {
               valid = 0;
-              printf("Filename too long, max length is 15");
+              printf("Filename too long, max length is 15 - ");
               state = 4;
             }
           }
@@ -117,7 +124,42 @@ char* getCommand(typeCommand* command) {
           break;
       }
     }
+    if(!valid) {
+      printf("Invalid command\n");
+      free(output);
+    }
   }
+
+  if(output != NULL && *output == EOF) {
+    printf("Do you want to save before quitting?(y/n): ");
+    while(1) {
+      input = getchar();
+      if(getchar() == '\n') {
+        if(input == 'y') {
+          printf("Enter filename(max 15): ");
+          output = (char*) realloc(output, 16*sizeof(char)); //Extra space for \0
+          valid = 0;
+          while(!valid) {
+            length = 0;
+            while(length < 15 && (input = getchar()) != '\n') {
+              output[length] = input;
+              length++;
+            }
+            if(length <= 15 && input == '\n')
+              valid = 1;
+            else {
+              printf("Filename too long!");
+              while(getchar() != '\n'); //EMPTY BUFFER
+            }
+          }
+          output[length] = '\0';
+        }
+      }
+      else
+        while(getchar() != '\n');//EMPTY BUFFER
+    }
+  }
+
   return output;
 }
 
