@@ -25,42 +25,38 @@ int main(int argc, char **argv){
 		//MAIN POSTA
 		gameState state = GAME;
 		//typeBoard board; DECLARED BEFORE IF STATEMENT
-		char* filename;
-		int player;
+		typeCommand command;
+		char *filename, *retValue;
+		int player = 1; //FOR TESTING, should be random or loaded
 		while(state != QUIT) {
 			switch(state) {
 				case MENU:
-					printf("This is a menu");
+					printf("This is a menu"); //SPACEHOLDER
 					getchar();
 					break;
 
 				case GAME:
-					player = 1; //Just for testing
 					//Generate board if not loaded (wip)
-					char* retValue;
-					typeCommand command;
-					while(state == GAME) {
-						if(canMove(player, &board)) {
-							do {
-								retValue = getCommand(&command);
-								if(retValue != NULL) {
-									if(*retValue == EOF) //PLAYER QUIT
-										state = MENU;
-									else {
-										state = SAVE;
-										filename = retValue;
-									}
+					if(canMove(player, &board)) {
+						do {
+							retValue = getCommand(&command);
+							if(retValue != NULL) {
+								if(*retValue == EOF) //PLAYER QUIT
+									state = MENU;
+								else {
+									state = SAVE;
+									filename = retValue;
 								}
-							} while(state == GAME && !validCommand(&command, &board, player));
-							printf("SX:%d SY:%d TX:%d TY:%d\n", command.source.x, command.source.y, command.target.x, command.target.y);
-						}
-						else
-							state = END;//Someone won
+							}
+						} while(state == GAME && !validCommand(&command, &board, player));
+						printf("SX:%d SY:%d TX:%d TY:%d\n", command.source.x, command.source.y, command.target.x, command.target.y);
 					}
+					else
+						state = END;//Someone won
 					break;
 
 				case SAVE:
-					printf("Game %s saved!", filename);
+					printf("Game %s saved!", filename); //SPACEHOLDER
 					getchar();
 					state = MENU;
 					break;

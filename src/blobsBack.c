@@ -3,7 +3,7 @@
 #include "blobsBack.h"
 
 
-int canMove(int player, typeBoard* board) {
+int canMove(int player, typeBoard *board) {
   int i, j;
   for(i = 0; i < board->h; i++) {
     for(j = 0; j < board->w; j++) {
@@ -15,10 +15,10 @@ int canMove(int player, typeBoard* board) {
   return 0;
 }
 
-char* getCommand(typeCommand* command) {
+char* getCommand(typeCommand *command) {
   char input;
-  const char* pattern;
-  char* output;
+  const char *pattern;
+  char *output;
   int state;
   int  valid = 0, i, length;
 
@@ -53,25 +53,25 @@ char* getCommand(typeCommand* command) {
           break;
 
         case 1:
-          if(pattern[i] == '#') {
-            if(input >= '0' && input <= '9') {
-              if(command->source.y == -1) command->source.y = input-'0';
-              else if(command->source.x == -1) command->source.x = input-'0';
-              else if(command->target.y == -1) command->target.y = input-'0';
-              else if(command->target.x == -1) command->target.x = input-'0';
-            }
-            else
-              state = 4;
-          }
-          else if(pattern[i] == '*') {
+          if(pattern[i] == '*') {
             if(input >= '0' && input <= '9') {
               if(command->source.y < 10) command->source.y = command->source.y*10 + (input-'0');
               else if(command->source.x < 10) command->source.x = command->source.x*10 + (input-'0');
               else if(command->target.y < 10) command->target.y = command->target.y*10 + (input-'0');
               else if(command->target.x < 10) command->target.x = command->target.x*10 + (input-'0');
             }
-            else
+            i++;
+          }
+          if(pattern[i] == '#') {
+            if(input >= '0' && input <= '9') {
+              if(command->source.y == -1) command->source.y = input-'0';
+              else if(command->source.x == -1) command->source.x = input-'0';
+              else if(command->target.y == -1) command->target.y = input-'0';
+              else if(command->target.x == -1) command->target.x = input-'0';
               i++;
+            }
+            else
+              state = 4;
           }
           else if(input == pattern[i]) {
             i++;
@@ -125,6 +125,7 @@ char* getCommand(typeCommand* command) {
           break;
       }
     }
+
     if(!valid) {
       printf("Invalid command\n");
       free(output);
@@ -165,6 +166,11 @@ char* getCommand(typeCommand* command) {
     }
   }
 
+  command->source.x--;
+  command->source.y--;
+  command->target.x--;
+  command->target.y--;
+
   if(output != NULL && *output != EOF)
     output[length] = '\0';
 
@@ -178,17 +184,27 @@ int isInside(int x, int y, int w, int h) {
     return 0;
 }
 
-int validCommand(typeCommand* command, typeBoard* board, int player) {
-  if(!isInside(command->source.x, command->source.y, board->w, board->h))
+int validCommand(typeCommand *command, typeBoard *board, int player) {
+  if(!isInside(command->source.x, command->source.y, board->w, board->h)) {
+    printf("Invalid command, [%d,%d] doesn't exist!", command->source.y+1, command->source.x+1);
     return 0;
-  else if(!isInside(command->target.x, command->target.y, board->w, board->h))
+  }
+  else if(!isInside(command->target.x, command->target.y, board->w, board->h)) {
+    printf("Invalid command, [%d,%d] doesn't exist!", command->target.y+1, command->target.x+1);
     return 0;
-  else if(abs(command->source.x - command->target.x) > 2 || abs(command->source.y - command->target.y) > 2)
+  }
+  else if(board->get[command->source.y][command->source.x].owner != player) {
+    printf("Invalid command, [%d,%d] isn't yours!", command->source.y+1, command->source.x+1);
     return 0;
-  else if(board->get[command->source.y][command->source.x].owner != player)
+  }
+  else if(abs(command->source.x - command->target.x) > 2 || abs(command->source.y - command->target.y) > 2) {
+    printf("Invalid command, [%d,%d] can't move that far!", command->source.y+1, command->source.x+1);
     return 0;
-  else if(board->get[command->target.y][command->target.x].owner != 0)
+  }
+  else if(board->get[command->target.y][command->target.x].owner != 0) {
+    printf("Invalid command, [%d,%d] isn't empty!", command->target.y+1, command->target.x+1);
     return 0;
+  }
   else
     return 1;
 }

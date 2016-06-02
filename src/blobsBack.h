@@ -18,10 +18,10 @@ typedef struct {
 typedef struct{
   int h;
   int w;
-  typeBlob** get;
+  typeBlob **get;
 }typeBoard;
 
-int canMove(int player, typeBoard* board);
-char* getCommand(typeCommand* command);
+int canMove(int player, typeBoard *board);
+char* getCommand(typeCommand *command);
 int isInside(int x, int y, int w, int h); //Just for the record
-int validCommand(typeCommand* command, typeBoard* board, int player);
+int validCommand(typeCommand *command, typeBoard *board, int player);
