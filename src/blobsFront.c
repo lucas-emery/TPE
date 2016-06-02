@@ -8,18 +8,67 @@
 void render(typeBoard*board);
 void init(typeBoard*board);
 void fill(typeBoard*board);
-int
-main(void){
 
+int main(int argc, char **argv){
 	typeBoard board;
 
-	printf("La matriz:\n");
-	board.h = getint("Ingrese altura:\n");
-	board.w = getint("Ingrese ancho:\n");
-	init(&board);
-	fill(&board);
-	render(&board);
+	if(argc > 1 && *argv[1] == 'd') {
+		printf("La matriz:\n");
+		board.h = getint("Ingrese altura:\n");
+		board.w = getint("Ingrese ancho:\n");
+		init(&board);
+		fill(&board);
 
+		render(&board);
+	}
+	else {
+		//MAIN POSTA
+		gameState state = MENU;
+		//typeBoard board; DECLARED BEFORE IF STATEMENT
+		char* filename;
+		int player;
+		switch(state) {
+			case MENU:
+				break;
+
+			case GAME:
+				player = rand()%2; //Just for testing
+				//Generate board if not loaded (wip)
+				char* retValue;
+				typeCommand command;
+				while(state == GAME) {
+					if(canMove(player, &board)) {
+						do {
+							retValue = getCommand(&command);
+							if(retValue != NULL) {
+								if(*retValue == EOF) //PLAYER QUIT
+									state = MENU;
+								else {
+									state = SAVE;
+									filename = retValue;
+								}
+							}
+						} while(!validCommand(&command, &board, player));
+					}
+					else
+						state = END;//Someone won
+				}
+				break;
+
+			case SAVE:
+				break;
+
+			case LOAD:
+				break;
+
+			case END:
+				break;
+
+			//Other cases
+		}
+	}
+
+	return 0;
 }
 
 void fill(typeBoard * board){	//prueba para el switch

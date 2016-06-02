@@ -1,3 +1,5 @@
+typedef enum {MENU, GAME, SAVE, LOAD, END} gameState;
+
 typedef struct {
   int x;
   int y;
@@ -18,3 +20,8 @@ typedef struct{
   int w;
   typeBlob** get;
 }typeBoard;
+
+int canMove(int player, typeBoard* board);
+char* getCommand(typeCommand* command);
+int isInside(int x, int y, int w, int h); //Just for the record
+int validCommand(typeCommand* command, typeBoard* board, int player);
