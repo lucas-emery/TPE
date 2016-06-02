@@ -4,6 +4,13 @@
 #include "blobsBack.h"
 #define DIMX 5
 #define DIMY 5
+#ifdef _WIN32
+	#define PLAYER1 "|A"
+	#define PLAYER2 "|Z"
+#else
+	#define PLAYER1 "|\x1b[31mO\x1b[0m"
+	#define PLAYER2 "|\x1b[36mO\x1b[0m"
+#endif
 
 void render(typeBoard*board);
 void init(typeBoard*board);
@@ -96,13 +103,11 @@ void render(typeBoard* board){
 					break;
 
 				case 1:
-					//printf("|\x1b[31mO\x1b[0m");
-					printf("|A");
+					printf(PLAYER1);
 					break;
 
 				case 2:
-					//printf("|\x1b[36mO\x1b[0m");
-					printf("|Z");
+					printf(PLAYER2);
 					break;
 			}
 		}
