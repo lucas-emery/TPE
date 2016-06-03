@@ -54,20 +54,21 @@ char* getCommand(typeCommand *command) {
 
         case 1:
           if(pattern[i] == '*') {
-            if(input >= '0' && input <= '9') {
-              if(command->source.y < 10) command->source.y = command->source.y*10 + (input-'0');
-              else if(command->source.x < 10) command->source.x = command->source.x*10 + (input-'0');
-              else if(command->target.y < 10) command->target.y = command->target.y*10 + (input-'0');
-              else if(command->target.x < 10) command->target.x = command->target.x*10 + (input-'0');
-            }
             i++;
+            if(input >= '0' && input <= '9') {
+              if(i == 3) command->source.y = command->source.y*10 + (input-'0');
+              else if(i == 6) command->source.x = command->source.x*10 + (input-'0');
+              else if(i == 10) command->target.y = command->target.y*10 + (input-'0');
+              else if(i == 13) command->target.x = command->target.x*10 + (input-'0');
+              break; //TODO
+            }
           }
           if(pattern[i] == '#') {
             if(input >= '0' && input <= '9') {
-              if(command->source.y == -1) command->source.y = input-'0';
-              else if(command->source.x == -1) command->source.x = input-'0';
-              else if(command->target.y == -1) command->target.y = input-'0';
-              else if(command->target.x == -1) command->target.x = input-'0';
+              if(i == 1) command->source.y = input-'0';
+              else if(i == 4) command->source.x = input-'0';
+              else if(i == 8) command->target.y = input-'0';
+              else if(i == 11) command->target.x = input-'0';
               i++;
             }
             else

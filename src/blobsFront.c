@@ -7,9 +7,11 @@
 #ifdef _WIN32
 	#define PLAYER1 "|A"
 	#define PLAYER2 "|Z"
+	#define CLEAR "cls"
 #else
 	#define PLAYER1 "|\x1b[36mO\x1b[0m" //Blue
 	#define PLAYER2 "|\x1b[31mO\x1b[0m" //Red
+	#define CLEAR "clear"
 #endif
 
 void render(typeBoard *board, const int *blobCount);
@@ -98,6 +100,8 @@ void fill(typeBoard * board){	//prueba para el switch
 }
 
 void render(typeBoard* board, const int blobCount[]){
+
+	system(CLEAR);
 
 	int i,j;
 	printf("P1:%d\tP1:%d\n", blobCount[1], blobCount[2]);
