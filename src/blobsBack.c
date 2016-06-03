@@ -2,6 +2,62 @@
 #include <stdlib.h>
 #include "blobsBack.h"
 
+void init(typeBoard *board){ //mover al back
+  typeBlob *temp;
+  int i;
+  board>get = (typeBlob**) malloc(board->h * sizeof(typeBlob*));
+  temp = (typeBlob*) malloc(board->h * board->w * sizeof(typeBlob));
+  for (i = 0; i < board->h; i++) {
+      board->get[i] = temp + (i * board->w);
+  }
+}
+
+void fill(typeBoard * board){ //prueba para el switch
+ int i,j;
+ for(i=0; i < board->h; i++){
+  for(j=0; j < board->w ; j++){
+    if ( j == 0 && (i == 0 || i == board->h-1)){
+      board->get[i][j].owner = 1;
+      board->get[i][j].canMove = 8;
+    }
+    else if ( j == board->w-1 && (i == 0 || i == board->h-1)){
+      board->get[i][j].owner = 2;
+      board->get[i][j].canMove = 8;
+    }
+    else
+      board->get[i][j].owner = 0;
+    }
+  }
+}
+
+void render(typeBoard* board, const int blobCount[]){
+
+  system(CLEAR);
+
+  int i,j;
+  printf("P1:%d\tP1:%d\n", blobCount[1], blobCount[2]);
+  for(i=0;i < board->h;i++){
+    for(j=0;j < board->w;j++)
+    {
+      switch(board->get[i][j].owner){
+
+        case 0:
+          printf("| ");
+          break;
+
+        case 1:
+          printf(PLAYER1);
+          break;
+
+        case 2:
+          printf(PLAYER2);
+          break;
+      }
+    }
+
+    printf("|\n"); //prueba
+  }
+}
 
 int canMove(int player, typeBoard *board) {
   int i, j;

@@ -27,3 +27,6 @@ int isInside(int x, int y, int w, int h); //Just for the record
 int validCommand(int player, typeCommand *command, typeBoard *board);
 int move(int player, typeCommand *command, typeBoard *board);
 void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]);
+void render(typeBoard *board, const int *blobCount);
+void init(typeBoard *board);
+void fill(typeBoard *board);
