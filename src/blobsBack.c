@@ -184,7 +184,7 @@ int isInside(int x, int y, int w, int h) {
     return 0;
 }
 
-int validCommand(typeCommand *command, typeBoard *board, int player) {
+int validCommand(int player, typeCommand *command, typeBoard *board) {
   if(!isInside(command->source.x, command->source.y, board->w, board->h)) {
     printf("Invalid command, [%d,%d] doesn't exist!", command->source.y+1, command->source.x+1);
     return 0;
@@ -209,6 +209,44 @@ int validCommand(typeCommand *command, typeBoard *board, int player) {
     return 1;
 }
 
-int move(int player, typeCommand *command) {
-  
+int move(int player, typeCommand *command, typeBoard *board) {
+  board->get[command->target.y][command->target.x].owner = player;
+  if(abs(command->source.x - command->target.x) == 2 || abs(command->source.y - command->target.y) == 2) {
+    board->get[command->source.y][command->source.x].owner = 0;
+    return 0;
+  }
+  return 1;
+}
+
+void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]) {
+  int otherPlayer, minX, maxX, minY, maxY;
+  if(player == 1)
+    otherPlayer = 2;
+  else
+    otherPlayer = 1;
+
+  minX = command->target.x-1;
+  maxX = command->target.x+1;
+  minY = command->target.y-1;
+  maxY = command->target.y+1;
+
+  if(command->target.x == 0)
+    minX++;
+  else if(command->target.x == (board->w - 1))
+    maxX--;
+  if(command->target.y == 0)
+    minY++;
+  else if(command->target.y == (board->h - 1))
+    maxY--;
+
+  int i, j;
+  for(i = minY; i <= maxY; i++) {
+    for(j = minX; j <= maxX; j++) {
+      if(board->get[i][j].owner == otherPlayer) {
+        board->get[i][j].owner = player;
+        blobCount[player]++;
+        blobCount[otherPlayer]--;
+      }
+    }
+  }
 }

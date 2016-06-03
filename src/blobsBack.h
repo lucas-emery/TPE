@@ -24,4 +24,6 @@ typedef struct{
 int canMove(int player, typeBoard *board);
 char* getCommand(typeCommand *command);
 int isInside(int x, int y, int w, int h); //Just for the record
-int validCommand(typeCommand *command, typeBoard *board, int player);
+int validCommand(int player, typeCommand *command, typeBoard *board);
+int move(int player, typeCommand *command, typeBoard *board);
+void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]);

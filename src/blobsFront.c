@@ -51,8 +51,10 @@ int main(int argc, char **argv) {
 								filename = retValue;
 							}
 						}
-					} while(state == GAME && !validCommand(&command, &board, player));
-					printf("SX:%d SY:%d TX:%d TY:%d\n", command.source.x, command.source.y, command.target.x, command.target.y);
+					} while(state == GAME && !validCommand(player, &command, &board));
+					blobCount[player] += move(player, &command, &board);
+					conquer(player, &command, &board, blobCount);
+
 				}
 				else
 					state = END;//Someone won
