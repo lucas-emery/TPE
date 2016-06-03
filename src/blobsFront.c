@@ -9,8 +9,8 @@
 	#define PLAYER2 "|Z"
 	#define CLEAR "cls"
 #else
-	#define PLAYER1 "|\x1b[36mO\x1b[0m" //Blue
-	#define PLAYER2 "|\x1b[31mO\x1b[0m" //Red
+	#define PLAYER1 "|\x1b[36;1mO\x1b[0m" //Blue
+	#define PLAYER2 "|\x1b[31;1mO\x1b[0m" //Red
 	#define CLEAR "clear"
 #endif
 
@@ -37,13 +37,14 @@ int main(int argc, char **argv) {
 		switch(state) {
 			case MENU:
 				printf("This is a menu"); //SPACEHOLDER
-				getchar();
+				while(getchar() != '\n');
 				break;
 
 			case GAME:
 				//Generate board if not loaded (wip)
 				render(&board, blobCount);
 				if(canMove(player, &board)) {
+					//IMPRIMIR TURNO Y COMANDOS DISPONIBLES
 					do {
 						retValue = getCommand(&command);
 						if(retValue != NULL) {
@@ -55,9 +56,14 @@ int main(int argc, char **argv) {
 							}
 						}
 					} while(state == GAME && !validCommand(player, &command, &board));
-					blobCount[player] += move(player, &command, &board);
-					conquer(player, &command, &board, blobCount);
-
+					if(state == GAME) {
+						blobCount[player] += move(player, &command, &board);
+						conquer(player, &command, &board, blobCount);
+						if(player == 1)
+							player = 2;
+						else
+							player = 1;
+					}
 				}
 				else
 					state = END;//Someone won
@@ -65,14 +71,21 @@ int main(int argc, char **argv) {
 
 			case SAVE:
 				printf("Game %s saved!", filename); //SPACEHOLDER
-				getchar();
-				state = MENU;
+				while(getchar() != '\n');
+				state = GAME;
 				break;
 
 			case LOAD:
 				break;
 
 			case END:
+				if(blobCount[1] > blobCount[2])
+					player = 1;
+				else
+					player = 2;
+				printf("Player %d won!", player);
+				while(getchar() != '\n');
+				state = MENU;
 				break;
 
 			//Other cases
