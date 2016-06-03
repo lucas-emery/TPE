@@ -23,7 +23,7 @@ IDEA1
       }
     }
 
-    void render(char** tablero, int dimx, int dimy) {
+    void render(char** tablero, int dimx, int dimy) { //LISTO
       loop(todoeltablero) {
         modo caca:
           imprime las A y las Z bien villa
@@ -34,7 +34,7 @@ IDEA1
     }
 
   blobsback.c
-    movimiento pedirMov(int player){
+    movimiento pedirMov(int player){ //LISTO
       command = null; //WIP
       if(hayMovValido) {
         do {
@@ -44,7 +44,7 @@ IDEA1
       return command;
     }
 
-    int validarMov(movimiento command, int player) {
+    int validarMov(movimiento command, int player) { //LISTO
       int esValido = 1;
       if(command.inicio no es de player) esValido = 0;
       else if(command.fin no esta vacio) esValido = 0;
