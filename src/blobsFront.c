@@ -8,8 +8,8 @@
 	#define PLAYER1 "|A"
 	#define PLAYER2 "|Z"
 #else
-	#define PLAYER1 "|\x1b[31mO\x1b[0m"
-	#define PLAYER2 "|\x1b[36mO\x1b[0m"
+	#define PLAYER1 "|\x1b[36mO\x1b[0m" //Blue
+	#define PLAYER2 "|\x1b[31mO\x1b[0m" //Red
 #endif
 
 void render(typeBoard*board);
@@ -85,10 +85,19 @@ int main(int argc, char **argv){
 void fill(typeBoard * board){	//prueba para el switch
  int i,j;
  for(i=0; i < board->h; i++){
- 	for(j=0; j < board->w ; j++)
- 		board->get[i][j].owner = rand()%3;
- }
-
+ 	for(j=0; j < board->w ; j++){
+ 		if ( j == 0 && (i == 0 || i == board->h-1)){
+ 			board->get[i][j].owner = 1;
+ 			board->get[i][j].canMove = 8;
+ 		}
+ 		else if ( j == board->w-1 && (i == 0 || i == board->h-1)){
+ 			board->get[i][j].owner = 2;
+ 			board->get[i][j].canMove = 8;
+ 		}
+ 		else
+ 			board->get[i][j].owner = 0;
+	 	}
+	}
 }
 void render(typeBoard* board){
 
