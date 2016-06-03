@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "blobsBack.h"
 
-void init(typeBoard *board){ //mover al back
+void init(typeBoard *board){
   typeBlob *temp;
   int i;
   if((board->get = (typeBlob**) malloc(board->h * sizeof(typeBlob*))) == NULL){

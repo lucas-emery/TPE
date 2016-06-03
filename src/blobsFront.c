@@ -27,13 +27,18 @@ int main(int argc, char **argv) {
 	gameState state = GAME;
 	typeCommand command;
 	char *filename, *retValue;
-	int player = 1; //FOR TESTING, should be random or loaded
+	int player = randInt(0,2) /* Generate a number between 1 & 2 (0 is not included) */
 
 	while(state != QUIT) {
 		switch(state) {
 			case MENU:
-				printf("This is a menu"); //SPACEHOLDER
-				while(getchar() != '\n');
+				printf("\t\t\tBienvenido al juego Guerra de Manchas (Blob Wars)\n"); //SPACEHOLDER
+				printf("1. Juego de dos jugadores\n");
+                printf("2. Juego contra computadora\n");
+                printf("3. Recuperar un juego guardado\n");
+                printf("4. Terminar\n");
+                printf("Elegir opción: \n");
+				while(getchar() != '\n'); /* getnum or getchar? */
 				break;
 
 			case GAME:
