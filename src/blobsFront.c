@@ -12,44 +12,13 @@
 	#define PLAYER2 "|\x1b[31mO\x1b[0m" //Red
 #endif
 
-<<<<<<< HEAD
-void render(typeBoard*board, const int points[]);
-void init(typeBoard*board);
-void fill(typeBoard*board);
-
-int main(int argc, char **argv){
-	int points[3] = {0,2,2};
-	typeBoard board;
-	//if(argc > 1 && *argv[1] == 'd') {
-		printf("La matriz:\n");
-		board.h = getint("Ingrese altura:\n");
-		board.w = getint("Ingrese ancho:\n");
-		init(&board);
-		fill(&board);
-
-		render(&board,points);
-	//}
-	//else {
-		//MAIN POSTA
-		gameState state = GAME;
-		//typeBoard board; DECLARED BEFORE IF STATEMENT
-		typeCommand command;
-		char *filename, *retValue;
-		int player = 1; //FOR TESTING, should be random or loaded
-		while(state != QUIT) {
-			switch(state) {
-				case MENU:
-					printf("This is a menu"); //SPACEHOLDER
-					getchar();
-					break;
-=======
-void render(typeBoard *board);
+void render(typeBoard *board, const int *blobCount);
 void init(typeBoard *board);
 void fill(typeBoard *board);
 
 int main(int argc, char **argv) {
->>>>>>> master
 
+	int blobCount[3] = {0,2,2};
 	typeBoard board;
 	printf("La matriz:\n");
 	board.h = getint("Ingrese altura:\n");
@@ -71,7 +40,7 @@ int main(int argc, char **argv) {
 
 			case GAME:
 				//Generate board if not loaded (wip)
-				render(&board);
+				render(&board, blobCount);
 				if(canMove(player, &board)) {
 					do {
 						retValue = getCommand(&command);
@@ -127,15 +96,11 @@ void fill(typeBoard * board){	//prueba para el switch
 	 	}
 	}
 }
-<<<<<<< HEAD
-void render(typeBoard* board, const int points[]){
-=======
 
-void render(typeBoard* board){
->>>>>>> master
+void render(typeBoard* board, const int blobCount[]){
 
 	int i,j;
-	printf("P1:%d\tP1:%d\n",points[1],points[2]);
+	printf("P1:%d\tP1:%d\n", blobCount[1], blobCount[2]);
 	for(i=0;i < board->h;i++){
 		for(j=0;j < board->w;j++)
 		{
