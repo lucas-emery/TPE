@@ -166,7 +166,7 @@ char* getCommand(typeCommand *command) {
     }
   }
 
-  command->source.x--;
+  command->source.x--; //Human to computer correction
   command->source.y--;
   command->target.x--;
   command->target.y--;
@@ -207,4 +207,8 @@ int validCommand(typeCommand *command, typeBoard *board, int player) {
   }
   else
     return 1;
+}
+
+int move(int player, typeCommand *command) {
+  
 }

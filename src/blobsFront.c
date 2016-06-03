@@ -12,73 +12,67 @@
 	#define PLAYER2 "|\x1b[31mO\x1b[0m" //Red
 #endif
 
-void render(typeBoard*board);
-void init(typeBoard*board);
-void fill(typeBoard*board);
+void render(typeBoard *board);
+void init(typeBoard *board);
+void fill(typeBoard *board);
 
-int main(int argc, char **argv){
+int main(int argc, char **argv) {
+
 	typeBoard board;
+	printf("La matriz:\n");
+	board.h = getint("Ingrese altura:\n");
+	board.w = getint("Ingrese ancho:\n");
+	init(&board);
+	fill(&board);
 
-	//if(argc > 1 && *argv[1] == 'd') {
-		printf("La matriz:\n");
-		board.h = getint("Ingrese altura:\n");
-		board.w = getint("Ingrese ancho:\n");
-		init(&board);
-		fill(&board);
+	gameState state = GAME;
+	typeCommand command;
+	char *filename, *retValue;
+	int player = 1; //FOR TESTING, should be random or loaded
 
-		render(&board);
-	//}
-	//else {
-		//MAIN POSTA
-		gameState state = GAME;
-		//typeBoard board; DECLARED BEFORE IF STATEMENT
-		typeCommand command;
-		char *filename, *retValue;
-		int player = 1; //FOR TESTING, should be random or loaded
-		while(state != QUIT) {
-			switch(state) {
-				case MENU:
-					printf("This is a menu"); //SPACEHOLDER
-					getchar();
-					break;
+	while(state != QUIT) {
+		switch(state) {
+			case MENU:
+				printf("This is a menu"); //SPACEHOLDER
+				getchar();
+				break;
 
-				case GAME:
-					//Generate board if not loaded (wip)
-					if(canMove(player, &board)) {
-						do {
-							retValue = getCommand(&command);
-							if(retValue != NULL) {
-								if(*retValue == EOF) //PLAYER QUIT
-									state = MENU;
-								else {
-									state = SAVE;
-									filename = retValue;
-								}
+			case GAME:
+				//Generate board if not loaded (wip)
+				render(&board);
+				if(canMove(player, &board)) {
+					do {
+						retValue = getCommand(&command);
+						if(retValue != NULL) {
+							if(*retValue == EOF) //PLAYER QUIT
+								state = MENU;
+							else {
+								state = SAVE;
+								filename = retValue;
 							}
-						} while(state == GAME && !validCommand(&command, &board, player));
-						printf("SX:%d SY:%d TX:%d TY:%d\n", command.source.x, command.source.y, command.target.x, command.target.y);
-					}
-					else
-						state = END;//Someone won
-					break;
+						}
+					} while(state == GAME && !validCommand(&command, &board, player));
+					printf("SX:%d SY:%d TX:%d TY:%d\n", command.source.x, command.source.y, command.target.x, command.target.y);
+				}
+				else
+					state = END;//Someone won
+				break;
 
-				case SAVE:
-					printf("Game %s saved!", filename); //SPACEHOLDER
-					getchar();
-					state = MENU;
-					break;
+			case SAVE:
+				printf("Game %s saved!", filename); //SPACEHOLDER
+				getchar();
+				state = MENU;
+				break;
 
-				case LOAD:
-					break;
+			case LOAD:
+				break;
 
-				case END:
-					break;
+			case END:
+				break;
 
-				//Other cases
-			}
+			//Other cases
 		}
-	//}
-
+	}
 	return 0;
 }
 
@@ -99,6 +93,7 @@ void fill(typeBoard * board){	//prueba para el switch
 	 	}
 	}
 }
+
 void render(typeBoard* board){
 
 	int i,j;
@@ -125,8 +120,8 @@ void render(typeBoard* board){
 	}
 }
 
-void init(typeBoard * board){ //mover al back
-	typeBlob* temp;
+void init(typeBoard *board){ //mover al back
+	typeBlob *temp;
 	int i;
 	board->get = (typeBlob**) malloc(board->h * sizeof(typeBlob*));
 	temp = (typeBlob*) malloc(board->h * board->w * sizeof(typeBlob));
