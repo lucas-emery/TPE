@@ -5,10 +5,19 @@
 void init(typeBoard *board){ //mover al back
   typeBlob *temp;
   int i;
-  board>get = (typeBlob**) malloc(board->h * sizeof(typeBlob*));
+  if((board->get = (typeBlob**) malloc(board->h * sizeof(typeBlob*))) == NULL){
+    printf("Error de memoria");
+  }
   temp = (typeBlob*) malloc(board->h * board->w * sizeof(typeBlob));
-  for (i = 0; i < board->h; i++) {
-      board->get[i] = temp + (i * board->w);
+  if(temp == NULL)
+  {
+    printf("Error de memoria");
+  }
+  else
+  {
+    for (i = 0; i < board->h; i++) {
+        board->get[i] = temp + (i * board->w);
+    }
   }
 }
 
