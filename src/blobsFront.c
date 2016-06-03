@@ -12,13 +12,13 @@
 	#define PLAYER2 "|\x1b[31mO\x1b[0m" //Red
 #endif
 
-void render(typeBoard*board);
+void render(typeBoard*board, const int points[]);
 void init(typeBoard*board);
 void fill(typeBoard*board);
 
 int main(int argc, char **argv){
+	int points[3] = {0,2,2};
 	typeBoard board;
-
 	//if(argc > 1 && *argv[1] == 'd') {
 		printf("La matriz:\n");
 		board.h = getint("Ingrese altura:\n");
@@ -26,7 +26,7 @@ int main(int argc, char **argv){
 		init(&board);
 		fill(&board);
 
-		render(&board);
+		render(&board,points);
 	//}
 	//else {
 		//MAIN POSTA
@@ -99,9 +99,10 @@ void fill(typeBoard * board){	//prueba para el switch
 	 	}
 	}
 }
-void render(typeBoard* board){
+void render(typeBoard* board, const int points[]){
 
 	int i,j;
+	printf("P1:%d\tP1:%d\n",points[1],points[2]);
 	for(i=0;i < board->h;i++){
 		for(j=0;j < board->w;j++)
 		{
