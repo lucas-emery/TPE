@@ -4,6 +4,7 @@
 #include "blobsBack.h"
 #define DIMX 5
 #define DIMY 5
+#define MENU 1
 #ifdef _WIN32
 	#define PLAYER1 "|A"
 	#define PLAYER2 "|Z"
@@ -28,6 +29,8 @@ int main(int argc, char **argv) {
 	typeCommand command;
 	char *filename, *retValue;
 	int player = randInt(0,2); /* Generate a number between 1 & 2 (0 is not included) */
+
+    state = MENU; /* Define initial state */
 
 	while(state != QUIT) {
 		switch(state) {
@@ -93,4 +96,34 @@ int main(int argc, char **argv) {
 		}
 	}
 	return 0;
+}
+
+
+void render(typeBoard* board, const int blobCount[]){
+
+  system(CLEAR);
+
+  int i,j;
+  printf("P1:%d\tP1:%d\n", blobCount[1], blobCount[2]);
+  for(i=0;i < board->h;i++){
+    for(j=0;j < board->w;j++)
+    {
+      switch(board->get[i][j].owner){
+
+        case 0:
+          printf("| ");
+          break;
+
+        case 1:
+          printf(PLAYER1);
+          break;
+
+        case 2:
+          printf(PLAYER2);
+          break;
+      }
+    }
+
+    printf("|\n"); //prueba
+  }
 }
