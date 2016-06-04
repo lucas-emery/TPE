@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
 	gameState state = GAME;
 	typeCommand command;
 	char *filename, *retValue;
-	int player = randInt(0,2) /* Generate a number between 1 & 2 (0 is not included) */
+	int player = randInt(0,2); /* Generate a number between 1 & 2 (0 is not included) */
 
 	while(state != QUIT) {
 		switch(state) {
