@@ -127,3 +127,9 @@ void render(typeBoard* board, const int blobCount[]){
     printf("|\n"); //prueba
   }
 }
+
+int save(/*...WIP...*/) /* ERROR HANDLING: DEVUELVE SI HUBO UN PROBLEMA AL GUARDAR */
+;
+int load(/*...WIP...*/)  /* ERROR HANDLING: DEVUELVE SI HUBO UN PROBLEMA AL CARGAR, EJ. CORRUPTO O NO EXISTE */
+;
+
