@@ -39,35 +39,6 @@ void fill(typeBoard * board){ //prueba para el switch
   }
 }
 
-void render(typeBoard* board, const int blobCount[]){
-
-  system(CLEAR);
-
-  int i,j;
-  printf("P1:%d\tP1:%d\n", blobCount[1], blobCount[2]);
-  for(i=0;i < board->h;i++){
-    for(j=0;j < board->w;j++)
-    {
-      switch(board->get[i][j].owner){
-
-        case 0:
-          printf("| ");
-          break;
-
-        case 1:
-          printf(PLAYER1);
-          break;
-
-        case 2:
-          printf(PLAYER2);
-          break;
-      }
-    }
-
-    printf("|\n"); //prueba
-  }
-}
-
 int canMove(int player, typeBoard *board) {
   int i, j;
   for(i = 0; i < board->h; i++) {
