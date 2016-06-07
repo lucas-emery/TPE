@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include "blobsBack.h"
 
+#define INCREMENT 1
+#define DECREMENT -1
+
 typedef enum {GETSOURCE, GETTARGET} AIstate;
 
 void init(typeBoard *board){
@@ -248,14 +251,14 @@ int validCommand(int player, typeCommand *command, typeBoard *board) {
     return TRUE;
 }
 
-//Sing must be -1 if source and 1 if target
-void updateBoard(typeBoard *board, typeCoord center, int radius, int sign) {
+//Action must be INCREMENT or DECREMENT
+void updateMoveMap(typeCoord center, typeBoard *board, int action) {
   int minX, maxX, minY, maxY;
 
-  minX = center.x - radius;
-  maxX = center.x + radius;
-  minY = center.y - radius;
-  maxY = center.y + radius;
+  minX = center.x - 2;
+  maxX = center.x + 2;
+  minY = center.y - 2;
+  maxY = center.y + 2;
 
   if(minX < 0)
     minX = 0;
@@ -269,20 +272,53 @@ void updateBoard(typeBoard *board, typeCoord center, int radius, int sign) {
   int i, j;
   for(i = minY; i <= maxY; i++) {
     for(j = minX; j <= maxX; j++) {
-      board->get[i][j].canMove -= sign;
-      board->get[i][j].canEat += sign;
+      board->get[i][j].canMove += action;
     }
   }
 
-  //Correct outside loop to increase loop eficiency
-  board->get[center.y][center.x].canMove -= sign;
-  board->get[center.y][center.x].canEat += sign;
+  //Correct outside loop to halve comparisons
+  board->get[center.y][center.x].canMove -= action;
+}
+
+//Action must be INCREMENT or DECREMENT
+void updateEatMap(typeCoord center, typeBoard *board, int action) {
+  int minX, maxX, minY, maxY;
+
+  minX = center.x - 1;
+  maxX = center.x + 1;
+  minY = center.y - 1;
+  maxY = center.y + 1;
+
+  if(minX < 0)
+    minX = 0;
+  else if(maxX >= board->w)
+    maxX = board->w - 1;
+  if(minY < 0)
+    minY = 0;
+  else if(maxY >= board->h)
+    maxY = board->h - 1;
+
+  int i, j;
+  for(i = minY; i <= maxY; i++) {
+    for(j = minX; j <= maxX; j++) {
+      board->get[i][j].canEat += action;
+    }
+  }
+
+  //Correct outside loop to halve comparisons
+  board->get[center.y][center.x].canEat -= action;
 }
 
 int move(int player, typeCommand *command, typeBoard *board) {
   board->get[command->target.y][command->target.x].owner = player;
+  updateMoveMap(command->target, board, DECREMENT);
+  if(player != AIPLAYER)
+    updateEatMap(command->target, board, INCREMENT);
   if(abs(command->source.x - command->target.x) == 2 || abs(command->source.y - command->target.y) == 2) {
     board->get[command->source.y][command->source.x].owner = 0;
+    updateMoveMap(command->source, board, INCREMENT);
+    if(player != AIPLAYER)
+      updateEatMap(command->target, board, DECREMENT);
     return FALSE;
   }
   return TRUE;
@@ -290,6 +326,7 @@ int move(int player, typeCommand *command, typeBoard *board) {
 
 void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]) {
   int otherPlayer, minX, maxX, minY, maxY;
+  typeCoord coord;
   if(player == 1)
     otherPlayer = 2;
   else
@@ -309,13 +346,22 @@ void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]
   else if(maxY >= board->h)
     maxY = board->h - 1;
 
-  int i, j;
+  int i, j, action;
   for(i = minY; i <= maxY; i++) {
     for(j = minX; j <= maxX; j++) {
       if(board->get[i][j].owner == otherPlayer) {
         board->get[i][j].owner = player;
         blobCount[player]++;
         blobCount[otherPlayer]--;
+
+        if(player == AIPLAYER)
+          action = DECREMENT;
+        else
+          action = INCREMENT;
+
+        coord.y = i;
+        coord.x = j;
+        updateEatMap(coord, board, action);
       }
     }
   }
