@@ -24,21 +24,41 @@ int main(int argc, char **argv) {
 	init(&board);
 	fill(&board);
 
-	gameState state = GAME;
+	gameState state = MENU;
 	typeCommand command;
+	int vsAI;
 	char *filename, *retValue;
 	int player = rand()%2 + 1; /* Generate a number between 1 & 2 (0 is not included) */
 
 	while(state != QUIT) {
 		switch(state) {
 			case MENU:
-				printf("\t\t\tBienvenido al juego Guerra de Manchas (Blob Wars)\n"); //SPACEHOLDER
-				printf("1. Juego de dos jugadores\n");
-        printf("2. Juego contra computadora\n");
-        printf("3. Recuperar un juego guardado\n");
-        printf("4. Terminar\n");
-        printf("Elegir opción: \n");
-				while(getchar() != '\n'); /* getnum or getchar? */
+
+				vsAI=FALSE;
+				int aux=0;
+				printf("=====Bienvenido al juego Guerra de Manchas (Blob Wars)=====\n" 
+						"\t1. Juego de dos jugadores\n" 
+						"\t2. Juego contra computadora\n"
+        				"\t3. Recuperar un juego guardado\n"
+           				"\t4. Terminar\n\n"
+        				"Elegir opción: ");
+				do {
+				aux=getint("");
+				} while(!(aux >= 1 && aux <= 4));
+
+				if(aux == 1)
+					state = GAME;
+				else if(aux == 2){
+					state = GAME;
+					vsAI = TRUE;
+				}
+				else if(aux == 3)
+					state = LOAD;
+				else
+					state = QUIT;
+
+				printf("STATE == %d",state);
+
 				break;
 
 			case GAME:
@@ -77,6 +97,8 @@ int main(int argc, char **argv) {
 				break;
 
 			case LOAD:
+				printf("load\n");
+				getchar();
 				break;
 
 			case END:
@@ -88,6 +110,9 @@ int main(int argc, char **argv) {
 				while(getchar() != '\n');
 				state = MENU;
 				break;
+
+			default:
+			break;
 
 			//Other cases
 		}
