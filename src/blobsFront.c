@@ -4,7 +4,6 @@
 #include "blobsBack.h"
 #define DIMX 5
 #define DIMY 5
-#define MENU 1
 #ifdef _WIN32
 	#define PLAYER1 "|A"
 	#define PLAYER2 "|Z"
@@ -28,19 +27,17 @@ int main(int argc, char **argv) {
 	gameState state = GAME;
 	typeCommand command;
 	char *filename, *retValue;
-	int player = randInt(0,2); /* Generate a number between 1 & 2 (0 is not included) */
-
-    state = MENU; /* Define initial state */
+	int player = rand()%2 + 1; /* Generate a number between 1 & 2 (0 is not included) */
 
 	while(state != QUIT) {
 		switch(state) {
 			case MENU:
 				printf("\t\t\tBienvenido al juego Guerra de Manchas (Blob Wars)\n"); //SPACEHOLDER
 				printf("1. Juego de dos jugadores\n");
-                printf("2. Juego contra computadora\n");
-                printf("3. Recuperar un juego guardado\n");
-                printf("4. Terminar\n");
-                printf("Elegir opción: \n");
+        printf("2. Juego contra computadora\n");
+        printf("3. Recuperar un juego guardado\n");
+        printf("4. Terminar\n");
+        printf("Elegir opción: \n");
 				while(getchar() != '\n'); /* getnum or getchar? */
 				break;
 
@@ -132,4 +129,3 @@ int save(/*...WIP...*/) /* ERROR HANDLING: DEVUELVE SI HUBO UN PROBLEMA AL GUARD
 ;
 int load(/*...WIP...*/)  /* ERROR HANDLING: DEVUELVE SI HUBO UN PROBLEMA AL CARGAR, EJ. CORRUPTO O NO EXISTE */
 ;
-
