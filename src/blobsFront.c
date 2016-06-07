@@ -2,15 +2,17 @@
 #include <stdlib.h>
 #include "getnum.h"
 #include "blobsBack.h"
-#define DIMX 5
-#define DIMY 5
 #ifdef _WIN32
-	#define PLAYER1 "|A"
-	#define PLAYER2 "|Z"
+	#define PLAYER1 "A"
+	#define PLAYER2 "Z"
+	#define POINTS1 "P1"
+	#define POINTS2 "P2"
 	#define CLEAR "cls"
 #else
-	#define PLAYER1 "|\x1b[36;1mO\x1b[0m" //Blue
-	#define PLAYER2 "|\x1b[31;1mO\x1b[0m" //Red
+	#define POINTS1 "\x1b[36;1mP1\x1b[0m"
+	#define POINTS2 "\x1b[31;1mP2\x1b[0m"
+	#define PLAYER1 "\x1b[36;1mO\x1b[0m" //Blue
+	#define PLAYER2 "\x1b[31;1mO\x1b[0m" //Red
 	#define CLEAR "clear"
 #endif
 
@@ -28,6 +30,7 @@ int main(int argc, char **argv) {
 	typeCommand command;
 	int vsAI;
 	char *filename, *retValue;
+	srand(time(NULL));
 	int player = rand()%2 + 1; /* Generate a number between 1 & 2 (0 is not included) */
 
 	while(state != QUIT) {
@@ -44,6 +47,7 @@ int main(int argc, char **argv) {
         				"Elegir opción: ");
 				do {
 				aux=getint("");
+				system(CLEAR);
 				} while(!(aux >= 1 && aux <= 4));
 
 				if(aux == 1)
@@ -54,16 +58,18 @@ int main(int argc, char **argv) {
 				}
 				else if(aux == 3)
 					state = LOAD;
-				else
+				else if(aux == 4)
 					state = QUIT;
+				else 
+					printf("Opción invalida\n");
 
-				printf("STATE == %d",state);
+				printf("STATE == %d\n",state);
 
 				break;
 
 			case GAME:
 				//Generate board if not loaded (wip)
-				render(&board, blobCount);
+				render(&board, blobCount, player);
 				if(canMove(player, &board)) {
 					//IMPRIMIR TURNO Y COMANDOS DISPONIBLES
 					do {
@@ -121,12 +127,19 @@ int main(int argc, char **argv) {
 }
 
 
-void render(typeBoard* board, const int blobCount[]){
+void render(typeBoard* board, const int blobCount[],int player){
 
   system(CLEAR);
 
   int i,j;
-  printf("P1:%d\tP1:%d\n", blobCount[1], blobCount[2]);
+  //printf("P1:%d\tP2:%d\n", blobCount[1], blobCount[2]);
+  if(player==1){
+  	printf(POINTS1":%d\tP2:%d\n", blobCount[1], blobCount[2]);
+  }
+  else {
+  	printf("P1:%d\t"POINTS2":%d\n", blobCount[1], blobCount[2]);
+  }
+  
   for(i=0;i < board->h;i++){
     for(j=0;j < board->w;j++)
     {
@@ -137,16 +150,22 @@ void render(typeBoard* board, const int blobCount[]){
           break;
 
         case 1:
-          printf(PLAYER1);
+          printf("|"PLAYER1);
           break;
 
         case 2:
-          printf(PLAYER2);
+          printf("|"PLAYER2);
           break;
       }
     }
-
+  
     printf("|\n"); //prueba
+  }
+  if(player==1){
+  	printf("turno : "PLAYER1"\n");
+  }
+  else {
+  	printf("turno : "PLAYER2"\n");
   }
 }
 
