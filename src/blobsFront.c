@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "getnum.h"
 #include "blobsBack.h"
 #ifdef _WIN32
@@ -39,8 +40,8 @@ int main(int argc, char **argv) {
 
 				vsAI=FALSE;
 				int aux=0;
-				printf("=====Bienvenido al juego Guerra de Manchas (Blob Wars)=====\n" 
-						"\t1. Juego de dos jugadores\n" 
+				printf("=====Bienvenido al juego Guerra de Manchas (Blob Wars)=====\n"
+						"\t1. Juego de dos jugadores\n"
 						"\t2. Juego contra computadora\n"
         				"\t3. Recuperar un juego guardado\n"
            				"\t4. Terminar\n\n"
@@ -60,7 +61,7 @@ int main(int argc, char **argv) {
 					state = LOAD;
 				else if(aux == 4)
 					state = QUIT;
-				else 
+				else
 					printf("Opción invalida\n");
 
 				printf("STATE == %d\n",state);
@@ -71,18 +72,24 @@ int main(int argc, char **argv) {
 				//Generate board if not loaded (wip)
 				render(&board, blobCount, player);
 				if(canMove(player, &board)) {
-					//IMPRIMIR TURNO Y COMANDOS DISPONIBLES
-					do {
-						retValue = getCommand(&command);
-						if(retValue != NULL) {
-							if(*retValue == EOF) //PLAYER QUIT
-								state = MENU;
-							else {
-								state = SAVE;
-								filename = retValue;
+					if(vsAI && player == AIPLAYER) {
+						getAImove(&command, &board);
+						printf("ads");
+					}
+					else {
+						//IMPRIMIR TURNO Y COMANDOS DISPONIBLES
+						do {
+							retValue = getCommand(&command);
+							if(retValue != NULL) {
+								if(*retValue == EOF) //PLAYER QUIT
+									state = MENU;
+								else {
+									state = SAVE;
+									filename = retValue;
+								}
 							}
-						}
-					} while(state == GAME && !validCommand(player, &command, &board));
+						} while(state == GAME && !validCommand(player, &command, &board));
+					}
 					if(state == GAME) {
 						blobCount[player] += move(player, &command, &board);
 						conquer(player, &command, &board, blobCount);
@@ -139,7 +146,7 @@ void render(typeBoard* board, const int blobCount[],int player){
   else {
   	printf("P1:%d\t"POINTS2":%d\n", blobCount[1], blobCount[2]);
   }
-  
+
   for(i=0;i < board->h;i++){
     for(j=0;j < board->w;j++)
     {
@@ -158,7 +165,7 @@ void render(typeBoard* board, const int blobCount[],int player){
           break;
       }
     }
-  
+
     printf("|\n"); //prueba
   }
   if(player==1){

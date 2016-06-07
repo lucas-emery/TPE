@@ -374,4 +374,6 @@ void getAImove(typeCommand *command, typeBoard *board) {
         break;
     }
   }
+
+  *command = bestMove;
 }
