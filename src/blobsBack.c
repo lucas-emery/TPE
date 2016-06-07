@@ -248,6 +248,37 @@ int validCommand(int player, typeCommand *command, typeBoard *board) {
     return TRUE;
 }
 
+//Sing must be -1 if source and 1 if target
+void updateBoard(typeBoard *board, typeCoord center, int radius, int sign) {
+  int minX, maxX, minY, maxY;
+
+  minX = center.x - radius;
+  maxX = center.x + radius;
+  minY = center.y - radius;
+  maxY = center.y + radius;
+
+  if(minX < 0)
+    minX = 0;
+  else if(maxX >= board->w)
+    maxX = board->w - 1;
+  if(minY < 0)
+    minY = 0;
+  else if(maxY >= board->h)
+    maxY = board->h - 1;
+
+  int i, j;
+  for(i = minY; i <= maxY; i++) {
+    for(j = minX; j <= maxX; j++) {
+      board->get[i][j].canMove -= sign;
+      board->get[i][j].canEat += sign;
+    }
+  }
+
+  //Correct outside loop to increase loop eficiency
+  board->get[center.y][center.x].canMove -= sign;
+  board->get[center.y][center.x].canEat += sign;
+}
+
 int move(int player, typeCommand *command, typeBoard *board) {
   board->get[command->target.y][command->target.x].owner = player;
   if(abs(command->source.x - command->target.x) == 2 || abs(command->source.y - command->target.y) == 2) {
