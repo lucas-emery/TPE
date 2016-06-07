@@ -30,8 +30,8 @@ int main(int argc, char **argv) {
 	typeCommand command;
 	int vsAI;
 	char *filename, *retValue;
-	srand(time(NULL));
-	int player = rand()%2 + 1; /* Generate a number between 1 & 2 (0 is not included) */
+	randomize();
+	int player = randInt(0,2); /* Generate a number between 1 & 2 (0 is not included) */
 
 	while(state != QUIT) {
 		switch(state) {
