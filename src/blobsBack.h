@@ -13,6 +13,7 @@ typedef struct {
 typedef struct {
   int owner;
   int canMove;
+  int canEat;
 } typeBlob;
 
 typedef struct{

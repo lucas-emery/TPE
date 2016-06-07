@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "blobsBack.h"
 
+typedef enum {GETSOURCE, GETTARGET} AIstate;
+
 void init(typeBoard *board){
   typeBlob *temp;
   int i;
@@ -267,14 +269,14 @@ void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]
   minY = command->target.y-1;
   maxY = command->target.y+1;
 
-  if(command->target.x == 0)
-    minX++;
-  else if(command->target.x == (board->w - 1))
-    maxX--;
-  if(command->target.y == 0)
-    minY++;
-  else if(command->target.y == (board->h - 1))
-    maxY--;
+  if(minX < 0)
+    minX = 0;
+  else if(maxX >= board->w)
+    maxX = board->w - 1;
+  if(minY < 0)
+    minY = 0;
+  else if(maxY >= board->h)
+    maxY = board->h - 1;
 
   int i, j;
   for(i = minY; i <= maxY; i++) {
@@ -284,6 +286,92 @@ void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]
         blobCount[player]++;
         blobCount[otherPlayer]--;
       }
+    }
+  }
+}
+
+void getAImove(typeCommand *command, typeBoard *board) {
+  int i = 0, j = 0, minX, maxX, minY, maxY;
+  typeCommand bestMove;
+  typeCoord newMove;
+  int bestScore = 0, isBMmitosis = 0, isMitosis;
+  AIstate state;
+
+  bestMove.source.x = -1; //Signal that bestMove is empty
+
+  int searching = TRUE;
+  while(searching) {
+    switch(state) {
+      case GETSOURCE:
+      //FOR WITH BREAK LOOP??
+        if(i == board->h) {
+          searching = FALSE;
+        }
+        else {
+          if(board->get[i][j].owner == AIPLAYER && board->get[i][j].canMove) {
+            newMove.x = j;
+            newMove.y = i;
+            state = GETTARGET;
+          }
+
+          j++;
+          if(j == board->w) {
+            j = 0;
+            i++;
+          }
+        }
+        break;
+
+      case GETTARGET:
+        minX = newMove.x-2;
+        maxX = newMove.x+2;
+        minY = newMove.y-2;
+        maxY = newMove.y+2;
+
+        if(minX < 0)
+          minX = 0;
+        else if(maxX >= board->w)
+          maxX = board->w - 1;
+        if(minY < 0)
+          minY = 0;
+        else if(maxY >= board->h)
+          maxY = board->h - 1;
+
+        int k, l, override, sameScoreMoves;
+        for(k = minY; k <= maxY; k++) {
+          for(l = minX; l <= maxX; l++) {
+            if(board->get[k][l].owner == 0) {
+              if(board->get[k][l].canEat > bestScore) {
+                override = TRUE;
+                sameScoreMoves = 1;
+                if(abs(newMove.x - l) == 1 && abs(newMove.y - k) == 1)
+                  isMitosis = TRUE;
+              }
+              else if(board->get[k][l].canEat == bestScore) {
+                if(abs(newMove.x - l) == 1 && abs(newMove.y - k) == 1)
+                  isMitosis = TRUE;
+                if(!isBMmitosis && isMitosis) {
+                  override = TRUE;
+                  sameScoreMoves = 1;
+                }
+                else if(isMitosis == isBMmitosis) {
+                  sameScoreMoves++;
+                  if(rand()%sameScoreMoves == 0)
+                    override = TRUE;
+                }
+              }
+
+              if(override) {
+                bestMove.source.x = newMove.x;
+                bestMove.source.y = newMove.y;
+                bestMove.target.x = l;
+                bestMove.target.y = k;
+                isBMmitosis = isMitosis;
+              }
+            }
+          }
+        }
+        break;
     }
   }
 }
