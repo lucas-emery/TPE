@@ -6,12 +6,12 @@ void init(typeBoard *board){
   typeBlob *temp;
   int i;
   if((board->get = (typeBlob**) malloc(board->h * sizeof(typeBlob*))) == NULL){
-    printf("Error de memoria");
+    printf("Error de memoria\n");
   }
   temp = (typeBlob*) malloc(board->h * board->w * sizeof(typeBlob));
   if(temp == NULL)
   {
-    printf("Error de memoria");
+    printf("Error de memoria\n");
   }
   else
   {
@@ -44,11 +44,11 @@ int canMove(int player, typeBoard *board) {
   for(i = 0; i < board->h; i++) {
     for(j = 0; j < board->w; j++) {
       if(board->get[i][j].owner == player && board->get[i][j].canMove) {
-        return 1;
+        return TRUE;
       }
     }
   }
-  return 0;
+  return FALSE;
 }
 
 char* getCommand(typeCommand *command) {
@@ -56,7 +56,7 @@ char* getCommand(typeCommand *command) {
   const char *pattern;
   char *output;
   int state;
-  int  valid = 0, i, length;
+  int valid = FALSE, i, length;
 
   while(!valid) {
     output = NULL;
@@ -113,11 +113,11 @@ char* getCommand(typeCommand *command) {
           else if(input == pattern[i]) {
             i++;
             if(pattern[i] == '\0')
-              valid = 1;
+              valid = TRUE;
           }
           else {
             state = 4;
-            valid = 0;
+            valid = FALSE;
           }
           break;
 
@@ -128,10 +128,10 @@ char* getCommand(typeCommand *command) {
                 output = (char*) malloc(16*sizeof(char)); //Extra space for \0
               output[length] = input;
               length++;
-              valid = 1;
+              valid = TRUE;
             }
             else {
-              valid = 0;
+              valid = FALSE;
               printf("Filename too long, max length is 15 - ");
               state = 4;
             }
@@ -148,11 +148,11 @@ char* getCommand(typeCommand *command) {
             if(pattern[i] == '\0') {
               output = (char*) malloc(sizeof(char));
               *output = EOF;
-              valid = 1;
+              valid = TRUE;
             }
           }
           else {
-            valid = 0;
+            valid = FALSE;
             state = 4;
           }
           break;
@@ -171,7 +171,7 @@ char* getCommand(typeCommand *command) {
 
   if(output != NULL && *output == EOF) {
     printf("Do you want to save before quitting?(y/n): ");
-    valid = 0;
+    valid = FALSE;
     while(!valid) {
       input = getchar();
       if(getchar() == '\n') {
@@ -185,7 +185,7 @@ char* getCommand(typeCommand *command) {
               length++;
             }
             if(length <= 15 && input == '\n')
-              valid = 1;
+              valid = TRUE;
             else {
               printf("Filename too long!\n");
               while(getchar() != '\n'); //EMPTY BUFFER
@@ -193,7 +193,7 @@ char* getCommand(typeCommand *command) {
           }
         }
         else if(input == 'n')
-          valid = 1;
+          valid = TRUE;
       }
       else
         while(getchar() != '\n');//EMPTY BUFFER
@@ -216,43 +216,43 @@ char* getCommand(typeCommand *command) {
 
 int isInside(int x, int y, int w, int h) {
   if(x >= 0 && x < w && y >= 0 && y < h)
-    return 1;
+    return TRUE;
   else
-    return 0;
+    return FALSE;
 }
 
 int validCommand(int player, typeCommand *command, typeBoard *board) {
   if(!isInside(command->source.x, command->source.y, board->w, board->h)) {
-    printf("Invalid command, [%d,%d] doesn't exist!", command->source.y+1, command->source.x+1);
-    return 0;
+    printf("Invalid command, [%d,%d] doesn't exist!\n", command->source.y+1, command->source.x+1);
+    return FALSE;
   }
   else if(!isInside(command->target.x, command->target.y, board->w, board->h)) {
-    printf("Invalid command, [%d,%d] doesn't exist!", command->target.y+1, command->target.x+1);
-    return 0;
+    printf("Invalid command, [%d,%d] doesn't exist!\n", command->target.y+1, command->target.x+1);
+    return FALSE;
   }
   else if(board->get[command->source.y][command->source.x].owner != player) {
-    printf("Invalid command, [%d,%d] isn't yours!", command->source.y+1, command->source.x+1);
-    return 0;
+    printf("Invalid command, [%d,%d] isn't yours!\n", command->source.y+1, command->source.x+1);
+    return FALSE;
   }
   else if(abs(command->source.x - command->target.x) > 2 || abs(command->source.y - command->target.y) > 2) {
-    printf("Invalid command, [%d,%d] can't move that far!", command->source.y+1, command->source.x+1);
-    return 0;
+    printf("Invalid command, [%d,%d] can't move that far!\n", command->source.y+1, command->source.x+1);
+    return FALSE;
   }
   else if(board->get[command->target.y][command->target.x].owner != 0) {
-    printf("Invalid command, [%d,%d] isn't empty!", command->target.y+1, command->target.x+1);
-    return 0;
+    printf("Invalid command, [%d,%d] isn't empty!\n", command->target.y+1, command->target.x+1);
+    return FALSE;
   }
   else
-    return 1;
+    return TRUE;
 }
 
 int move(int player, typeCommand *command, typeBoard *board) {
   board->get[command->target.y][command->target.x].owner = player;
   if(abs(command->source.x - command->target.x) == 2 || abs(command->source.y - command->target.y) == 2) {
     board->get[command->source.y][command->source.x].owner = 0;
-    return 0;
+    return FALSE;
   }
-  return 1;
+  return TRUE;
 }
 
 void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]) {
