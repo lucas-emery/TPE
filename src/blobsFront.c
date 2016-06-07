@@ -3,6 +3,7 @@
 #include <time.h>
 #include "getnum.h"
 #include "blobsBack.h"
+#include "random.h"
 #ifdef _WIN32
 	#define PLAYER1 "A"
 	#define PLAYER2 "Z"
@@ -31,8 +32,8 @@ int main(int argc, char **argv) {
 	typeCommand command;
 	int vsAI;
 	char *filename, *retValue;
-	randomize();
-	int player = randInt(0,2); /* Generate a number between 1 & 2 (0 is not included) */
+	srand(time(NULL));
+	int player = rand()%2 + 1; /* Generate a number between 1 & 2 (0 is not included) */
 
 	while(state != QUIT) {
 		switch(state) {
@@ -74,7 +75,7 @@ int main(int argc, char **argv) {
 				if(canMove(player, &board)) {
 					if(vsAI && player == AIPLAYER) {
 						getAImove(&command, &board);
-						printf("ads");
+						printf("gotAImove\n");
 					}
 					else {
 						//IMPRIMIR TURNO Y COMANDOS DISPONIBLES
