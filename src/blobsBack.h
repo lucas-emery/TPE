@@ -35,4 +35,6 @@ void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]
 void render(typeBoard *board, const int *blobCount,int player);
 void init(typeBoard *board);
 void fill(typeBoard *board);
+void fillEatAndMove(typeBoard *board);
+void renderMaps(typeBoard *board);
 void getAImove(typeCommand *command, typeBoard *board);

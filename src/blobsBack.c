@@ -4,9 +4,22 @@
 
 typedef enum {GETSOURCE, GETTARGET} AIstate;
 
-void init(typeBoard *board){
+void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
+  
   typeBlob *temp;
-  int i;
+  int i,j,k,l,m;
+
+  if(loadedArray==NULL){
+
+    printf("La matriz:\n");
+    board->h = getint("Ingrese altura:\n");
+    board->w = getint("Ingrese ancho:\n");
+
+  }else {
+    board->h = dimy;
+    board->w = dimx;
+  }
+
   if((board->get = (typeBlob**) malloc(board->h * sizeof(typeBlob*))) == NULL){
     printf("Error de memoria\n");
   }
@@ -21,12 +34,70 @@ void init(typeBoard *board){
         board->get[i] = temp + (i * board->w);
     }
   }
-}
+
+
+
+  if(loadedArray==NULL){
+
+    fill(board);
+
+  }
+  else{
+
+    for(i = 0 ; i < dimx-1 ; i++){
+      for(j = 0 ; j < dimy-1 ; j++){
+        switch(loadedArray[i][j]){
+        
+          case '0':
+          board->get[i][j].owner = 0;
+          break;
+        
+          case 'A':
+          board->get[i][j].owner = 1;
+          break;
+        
+          case 'Z':
+          board->get[i][j].owner = 2;
+          break;
+
+        }
+      }
+    }
+  
+    free(*loadedArray);
+    free(loadedArray);
+  }
+
+
+  for(i = 0 ; i < board->h ; i++){
+    for(j = 0 ; j < board->w ; j++){
+      {
+        if( (i-2) < 0)
+
+        if( (i+2) > board->w )
+
+        if( () )
+
+        if( () )
+          
+        for(;;;){
+          for(;;;){
+            if()
+          }
+        }
+
+      }
+    }
+  }
+
+
+
+} 
 
 void fill(typeBoard * board){ //prueba para el switch
  int i,j;
- for(i=0; i < board->h; i++){
-  for(j=0; j < board->w ; j++){
+ for( i = 0 ; i < board->h; i++){
+  for( j = 0 ; j < board->w ; j++){
     if ( j == 0 && (i == 0 || i == board->h-1)){
       board->get[i][j].owner = 1;
       board->get[i][j].canMove = 8;
