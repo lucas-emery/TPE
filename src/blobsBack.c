@@ -342,7 +342,7 @@ int move(int player, typeCommand *command, typeBoard *board) {
     board->get[command->source.y][command->source.x].owner = 0;
     updateMoveMap(command->source, board, INCREMENT);
     if(player != AIPLAYER)
-      updateEatMap(command->target, board, DECREMENT);
+      updateEatMap(command->source, board, DECREMENT);
     return FALSE;
   }
   return TRUE;
