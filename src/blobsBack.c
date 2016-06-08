@@ -395,10 +395,10 @@ void getAImove(typeCommand *command, typeBoard *board) {
   int i = 0, j = 0, minX, maxX, minY, maxY;
   typeCommand bestMove;
   typeCoord newMove;
-  int bestScore = 0, isBMmitosis = 0, isMitosis;
-  AIstate state;
+  int bestScore = -1, isBMmitosis = 0, isMitosis;
+  AIstate state = GETSOURCE;
 
-  bestMove.source.x = -1; //Signal that bestMove is empty
+  //bestMove.source.x = -1; //Signal that bestMove is empty
 
   int searching = TRUE;
   while(searching) {
@@ -443,6 +443,8 @@ void getAImove(typeCommand *command, typeBoard *board) {
         for(k = minY; k <= maxY; k++) {
           for(l = minX; l <= maxX; l++) {
             if(board->get[k][l].owner == 0) {
+              override = FALSE;
+              isMitosis = FALSE;
               if(board->get[k][l].canEat > bestScore) {
                 override = TRUE;
                 sameScoreMoves = 1;
@@ -468,16 +470,17 @@ void getAImove(typeCommand *command, typeBoard *board) {
                 bestMove.source.y = newMove.y;
                 bestMove.target.x = l;
                 bestMove.target.y = k;
+                bestScore = board->get[k][l].canEat;
                 isBMmitosis = isMitosis;
+                printf("GotTarget [%d,%d]", k, l);
               }
             }
           }
         }
-        printf("GotTarget [%d,%d]", k, l);
         state = GETSOURCE;
         break;
     }
   }
-
+  getchar();
   *command = bestMove;
 }
