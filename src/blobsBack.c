@@ -44,6 +44,30 @@ void fill(typeBoard * board){ //prueba para el switch
   }
 }
 
+void fillEatAndMove(typeBoard *board) {
+  int moveMap[6][6] = {{8,10,13,13,10,8},
+                       {10,14,18,18,14,10},
+                       {13,18,23,23,18,13},
+                       {13,18,23,23,18,13},
+                       {10,14,18,18,14,10},
+                       {8,10,13,13,10,8}};
+
+  int eatMap[6][6] = {{0,1,0,0,0,0},
+                      {1,1,0,0,0,0},
+                      {0,0,0,0,0,0},
+                      {0,0,0,0,0,0},
+                      {1,1,0,0,0,0},
+                      {0,1,0,0,0,0}};
+
+  int i, j;
+  for (i = 0; i < board->h; i++) {
+    for (j = 0; j < board->w; j++) {
+      board->get[i][j].canMove = moveMap[i][j];
+      board->get[i][j].canEat = eatMap[i][j];
+    }
+  }
+}
+
 int canMove(int player, typeBoard *board) {
   int i, j;
   for(i = 0; i < board->h; i++) {
@@ -389,6 +413,7 @@ void getAImove(typeCommand *command, typeBoard *board) {
             newMove.x = j;
             newMove.y = i;
             state = GETTARGET;
+            printf("GotSource [%d,%d]", i, j);
           }
 
           j++;
@@ -448,6 +473,8 @@ void getAImove(typeCommand *command, typeBoard *board) {
             }
           }
         }
+        printf("GotTarget [%d,%d]", k, l);
+        state = GETSOURCE;
         break;
     }
   }
