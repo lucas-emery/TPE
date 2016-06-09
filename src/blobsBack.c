@@ -7,7 +7,7 @@ typedef enum {GETSOURCE, GETTARGET} AIstate;
 void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
   
   typeBlob *temp;
-  int i,j,k,l,m;
+  int i,j,k,l,minX,minY,maxX,maxY;
 
   if(loadedArray==NULL){
 
@@ -72,22 +72,38 @@ void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
   for(i = 0 ; i < board->h ; i++){
     for(j = 0 ; j < board->w ; j++){
       {
-        if( (i-2) < 0)
+        minY=i-2;
+        minX=j-2;
+        maxY=i+2;
+        maxX=j+2;
 
-        if( (i+2) > board->w )
+        if( minY < 0 )
+          minY = 0-i;
 
-        if( () )
+        if( maxY > board->h )
+          maxY = board->h;
 
-        if( () )
-          
-        for(;;;){
-          for(;;;){
-            if()
+        if( minX < 0)
+          minX = 0-j;
+
+        if( maxX > board->w )
+          maxX = board->w;
+
+        for(k = minY; k <= maxY; k++ ){
+          for(l = minX; l <= maxX; l++){
+            /*if(board->get[k][l].owner == 0){
+              board->get[i][j].canMove++;
+            }
+            else if(board->get[k][l].owner == 1)
+              ;
+            else (board->get[k][l].owner == 2)
+              ;*/
           }
         }
 
       }
     }
+
   }
 
 
@@ -100,11 +116,9 @@ void fill(typeBoard * board){ //prueba para el switch
   for( j = 0 ; j < board->w ; j++){
     if ( j == 0 && (i == 0 || i == board->h-1)){
       board->get[i][j].owner = 1;
-      board->get[i][j].canMove = 8;
     }
     else if ( j == board->w-1 && (i == 0 || i == board->h-1)){
       board->get[i][j].owner = 2;
-      board->get[i][j].canMove = 8;
     }
     else
       board->get[i][j].owner = 0;
