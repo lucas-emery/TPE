@@ -378,3 +378,22 @@ void getAImove(typeCommand *command, typeBoard *board) {
 
   *command = bestMove;
 }
+
+int endGame(typeBoard *board, int blobCount[]) {
+  int winner;
+  if(blobCount[1] > blobCount[2])
+    winner = 1;
+  else
+    winner = 2;
+
+  int i, j;
+  for(i = 0; i < board->h; i++) {
+    for(j = 0; j < board->w; j++) {
+      if(board->get[i][j].owner == 0) {
+        board->get[i][j].owner = winner;
+        blobCount[winner]++;
+      }
+    }
+  }
+  return winner;
+}

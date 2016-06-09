@@ -9,13 +9,13 @@
 	#define PLAYER2 "Z"
 	#define POINTS1 "P1"
 	#define POINTS2 "P2"
-	#define CLEAR "cls"
+	#define CLEAR_SCREEN system("cls")
 #else
 	#define POINTS1 "\x1b[36;1mP1\x1b[0m"
 	#define POINTS2 "\x1b[31;1mP2\x1b[0m"
 	#define PLAYER1 "\x1b[36;1mO\x1b[0m" //Blue
 	#define PLAYER2 "\x1b[31;1mO\x1b[0m" //Red
-	#define CLEAR "clear"
+	#define CLEAR_SCREEN system("clear")
 #endif
 
 int main(int argc, char **argv) {
@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 
 	gameState state = MENU;
 	typeCommand command;
-	int vsAI;
+	int vsAI, winner; //winner quedo aca porque no puede estar al principio de un case
 	char *filename, *retValue;
 	srand(time(NULL));
 	int player = rand()%2 + 1; /* Generate a number between 1 & 2 (0 is not included) */
@@ -41,6 +41,7 @@ int main(int argc, char **argv) {
 
 				vsAI=FALSE;
 				int aux=0;
+				CLEAR_SCREEN;
 				printf("=====Bienvenido al juego Guerra de Manchas (Blob Wars)=====\n"
 						"\t1. Juego de dos jugadores\n"
 						"\t2. Juego contra computadora\n"
@@ -49,7 +50,7 @@ int main(int argc, char **argv) {
         				"Elegir opción: ");
 				do {
 				aux=getint("");
-				system(CLEAR);
+				CLEAR_SCREEN;
 				} while(!(aux >= 1 && aux <= 4));
 
 				if(aux == 1)
@@ -70,7 +71,7 @@ int main(int argc, char **argv) {
 				break;
 
 			case GAME:
-				//Generate board if not loaded (wip)
+				//Generate board if not loaded (wip) or ¿loaded ended?
 				render(&board, blobCount, player);
 				if(canMove(player, &board)) {
 					if(vsAI && player == AIPLAYER) {
@@ -116,19 +117,13 @@ int main(int argc, char **argv) {
 				break;
 
 			case END:
-				if(blobCount[1] > blobCount[2])
-					player = 1;
-				else
-					player = 2;
-				printf("Player %d won!", player);
+				winner = endGame(&board, blobCount);
+				render(&board, blobCount, 0);
+				printf("Player %d won!\nPress enter to go back to menu\n", winner);
 				while(getchar() != '\n');
 				state = MENU;
 				break;
 
-			default:
-			break;
-
-			//Other cases
 		}
 	}
 	return 0;
@@ -137,16 +132,19 @@ int main(int argc, char **argv) {
 
 void render(typeBoard* board, const int blobCount[],int player){
 
-  system(CLEAR);
+  CLEAR_SCREEN;
 
   int i,j;
   //printf("P1:%d\tP2:%d\n", blobCount[1], blobCount[2]);
   if(player==1){
   	printf(POINTS1":%d\tP2:%d\n", blobCount[1], blobCount[2]);
   }
-  else {
+  else if(player == 2){
   	printf("P1:%d\t"POINTS2":%d\n", blobCount[1], blobCount[2]);
   }
+	else {
+		printf(POINTS1":%d\t"POINTS2":%d\n", blobCount[1], blobCount[2]);
+	}
 
   for(i=0;i < board->h;i++){
     for(j=0;j < board->w;j++)
@@ -172,7 +170,7 @@ void render(typeBoard* board, const int blobCount[],int player){
   if(player==1){
   	printf("turno : "PLAYER1"\n");
   }
-  else {
+  else if(player == 2){
   	printf("turno : "PLAYER2"\n");
   }
 }

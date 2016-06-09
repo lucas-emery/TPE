@@ -36,3 +36,4 @@ void render(typeBoard *board, const int *blobCount,int player);
 void init(typeBoard *board);
 void fill(typeBoard *board);
 void getAImove(typeCommand *command, typeBoard *board);
+int endGame(typeBoard *board, int blobCount[]);
