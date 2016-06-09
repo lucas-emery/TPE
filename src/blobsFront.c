@@ -173,6 +173,9 @@ void render(typeBoard* board, const int blobCount[],int player){
   else if(player == 2){
   	printf("turno : "PLAYER2"\n");
   }
+
+	printf("┌─┬─┐\n│O│ │\n├─┼─┤\n└─┴─┘\n");
+
 }
 
 int save(/*...WIP...*/) /* ERROR HANDLING: DEVUELVE SI HUBO UN PROBLEMA AL GUARDAR */
