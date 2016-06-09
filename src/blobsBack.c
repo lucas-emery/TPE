@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include "blobsBack.h"
 
 #define INCREMENT 1
 #define DECREMENT -1
 
 typedef enum {GETSOURCE, GETTARGET} AIstate;
+typedef enum {EAT, MOVE} mapType;
 
 void init(typeBoard *board){
   typeBlob *temp;
@@ -276,13 +278,23 @@ int validCommand(int player, typeCommand *command, typeBoard *board) {
 }
 
 //Action must be INCREMENT or DECREMENT
-void updateMoveMap(typeCoord center, typeBoard *board, int action) {
-  int minX, maxX, minY, maxY;
+void updateMap(typeCoord center, typeBoard *board, mapType type, int action) {
+  int minX, maxX, minY, maxY, radius;
+  size_t offset;
 
-  minX = center.x - 2;
-  maxX = center.x + 2;
-  minY = center.y - 2;
-  maxY = center.y + 2;
+  if(type == EAT) {
+    radius = 1;
+    offset = offsetof(typeBlob, canEat);
+  }
+  else {
+    radius = 2;
+    offset = offsetof(typeBlob, canMove);
+  }
+
+  minX = center.x - radius;
+  maxX = center.x + radius;
+  minY = center.y - radius;
+  maxY = center.y + radius;
 
   if(minX < 0)
     minX = 0;
@@ -296,53 +308,24 @@ void updateMoveMap(typeCoord center, typeBoard *board, int action) {
   int i, j;
   for(i = minY; i <= maxY; i++) {
     for(j = minX; j <= maxX; j++) {
-      board->get[i][j].canMove += action;
+      *((int*)(((size_t)&board->get[i][j])+offset)) += action; //Equals typeBlob.canEat or typeBlob.canMove
     }
   }
 
   //Correct outside loop to halve comparisons
-  board->get[center.y][center.x].canMove -= action;
-}
-
-//Action must be INCREMENT or DECREMENT
-void updateEatMap(typeCoord center, typeBoard *board, int action) {
-  int minX, maxX, minY, maxY;
-
-  minX = center.x - 1;
-  maxX = center.x + 1;
-  minY = center.y - 1;
-  maxY = center.y + 1;
-
-  if(minX < 0)
-    minX = 0;
-  else if(maxX >= board->w)
-    maxX = board->w - 1;
-  if(minY < 0)
-    minY = 0;
-  else if(maxY >= board->h)
-    maxY = board->h - 1;
-
-  int i, j;
-  for(i = minY; i <= maxY; i++) {
-    for(j = minX; j <= maxX; j++) {
-      board->get[i][j].canEat += action;
-    }
-  }
-
-  //Correct outside loop to halve comparisons
-  board->get[center.y][center.x].canEat -= action;
+  *((int*)(((size_t)&board->get[center.y][center.x])+offset)) -= action; //Equals typeBlob.canEat or typeBlob.canMove
 }
 
 int move(int player, typeCommand *command, typeBoard *board) {
   board->get[command->target.y][command->target.x].owner = player;
-  updateMoveMap(command->target, board, DECREMENT);
+  updateMap(command->target, board, MOVE, DECREMENT);
   if(player != AIPLAYER)
-    updateEatMap(command->target, board, INCREMENT);
+    updateMap(command->target, board, EAT, INCREMENT);
   if(abs(command->source.x - command->target.x) == 2 || abs(command->source.y - command->target.y) == 2) {
     board->get[command->source.y][command->source.x].owner = 0;
-    updateMoveMap(command->source, board, INCREMENT);
+    updateMap(command->source, board, MOVE, INCREMENT);
     if(player != AIPLAYER)
-      updateEatMap(command->source, board, DECREMENT);
+      updateMap(command->source, board, EAT, DECREMENT);
     return FALSE;
   }
   return TRUE;
@@ -385,7 +368,7 @@ void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]
 
         coord.y = i;
         coord.x = j;
-        updateEatMap(coord, board, action);
+        updateMap(coord, board, EAT, action);
       }
     }
   }
