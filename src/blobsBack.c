@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "blobsBack.h"
 
+typedef enum {CMD_START, CMD_MOVE, CMD_SAVE, CMD_QUIT, CMD_RESET} getCmdState;
 typedef enum {GETSOURCE, GETTARGET} AIstate;
 
 void init(typeBoard *board){
@@ -57,12 +58,12 @@ char* getCommand(typeCommand *command) {
   char input;
   const char *pattern;
   char *output;
-  int state;
+  getCmdState state;
   int valid = FALSE, i, length;
 
   while(!valid) {
     output = NULL;
-    state = 0;
+    state = CMD_START;
     i = 0;
     length = 0;
     command->source.x = -1;
@@ -72,25 +73,25 @@ char* getCommand(typeCommand *command) {
 
     while((input = getchar()) != '\n') {
       switch(state) {
-        case 0:
+        case CMD_START:
           if(input == '[') {
-            state = 1;
+            state = CMD_MOVE;
             pattern = "[#*,#*][#*,#*]";
           }
           else if(input == 's') {
-            state = 2;
+            state = CMD_SAVE;
             pattern = "save F";
           }
           else if(input == 'q') {
-            state = 3;
+            state = CMD_QUIT;
             pattern = "quit";
           }
           else
-            state = 4; //invalid command
+            state = CMD_RESET; //invalid command
           i++;
           break;
 
-        case 1:
+        case CMD_MOVE:
           if(pattern[i] == '*') {
             i++;
             if(input >= '0' && input <= '9') {
@@ -110,7 +111,7 @@ char* getCommand(typeCommand *command) {
               i++;
             }
             else
-              state = 4;
+              state = CMD_RESET;
           }
           else if(input == pattern[i]) {
             i++;
@@ -118,12 +119,12 @@ char* getCommand(typeCommand *command) {
               valid = TRUE;
           }
           else {
-            state = 4;
+            state = CMD_RESET;
             valid = FALSE;
           }
           break;
 
-        case 2:
+        case CMD_SAVE:
           if(pattern[i] == 'F') {
             if(length < 15) {
               if(output == NULL)
@@ -135,16 +136,16 @@ char* getCommand(typeCommand *command) {
             else {
               valid = FALSE;
               printf("Filename too long, max length is 15 - ");
-              state = 4;
+              state = CMD_RESET;
             }
           }
           else if(input == pattern[i])
             i++;
           else
-            state = 4;
+            state = CMD_RESET;
           break;
 
-        case 3:
+        case CMD_QUIT:
           if(input == pattern[i]) {
             i++;
             if(pattern[i] == '\0') {
@@ -155,12 +156,12 @@ char* getCommand(typeCommand *command) {
           }
           else {
             valid = FALSE;
-            state = 4;
+            state = CMD_RESET;
           }
           break;
 
-        case 4:
-          //EMPTY BUFFER
+        case CMD_RESET:
+          //EMPTIES BUFFER
           break;
       }
     }
