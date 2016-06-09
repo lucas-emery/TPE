@@ -78,26 +78,27 @@ void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
         maxX=j+2;
 
         if( minY < 0 )
-          minY = 0-i;
+          minY = 0;
 
-        if( maxY > board->h )
-          maxY = board->h;
+        if( maxY > board->h-1 )
+          maxY = board->h-1;
 
         if( minX < 0)
-          minX = 0-j;
+          minX = 0;
 
-        if( maxX > board->w )
-          maxX = board->w;
-
+        if( maxX > board->w-1 )
+          maxX = board->w-1;
+        /*printf("=i:%d=j:%d=mY:%d=MY:%d=mX:%d=MX:%d=\n",i,j,minY,maxY,minX,maxX);*/
         for(k = minY; k <= maxY; k++ ){
           for(l = minX; l <= maxX; l++){
-            /*if(board->get[k][l].owner == 0){
+            if
+            if(board->get[k][l].owner == 0){
               board->get[i][j].canMove++;
             }
             else if(board->get[k][l].owner == 1)
               ;
             else (board->get[k][l].owner == 2)
-              ;*/
+              ;
           }
         }
 
