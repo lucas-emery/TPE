@@ -24,7 +24,19 @@ typedef struct{
   int h;
   int w;
   typeBlob **get;
-}typeBoard;
+} typeBoard;
+
+typedef struct
+	{
+		int mode;
+		int nextTurn;
+		int h;
+		int w;
+		int blobsPlayer1;
+		int blobsPlayer2;
+		char blobs[1000];
+
+} typeSave;
 
 int canMove(int player, typeBoard *board);
 char* getCommand(typeCommand *command);
@@ -39,3 +51,4 @@ void fillEatAndMove(typeBoard *board);
 void renderMaps(typeBoard *board);
 void getAImove(typeCommand *command, typeBoard *board);
 int endGame(typeBoard *board, int blobCount[]);
+int save(char *filename, int mode, int player, typeBoard *board);

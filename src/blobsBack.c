@@ -206,7 +206,7 @@ char* getCommand(typeCommand *command) {
   }
 
   if(output != NULL && *output == EOF) {
-    printf("Desea guardar antes de salir?(s/n): ");
+    printf("¿Desea guardar antes de salir?(s/n): ");
     valid = FALSE;
     while(!valid) {
       input = getchar();
@@ -216,7 +216,7 @@ char* getCommand(typeCommand *command) {
           output[0] = 'T'; //True
           output++;
           while(!valid) {
-            printf("Ingrese un nombre para el archivo(max 15): ");
+            printf("Ingrese un nombre para el archivo (máximo 15 caracteres): ");
             length = 0;
             while(length < 15 && (input = getchar()) != '\n') {
               output[length] = input;
@@ -225,7 +225,7 @@ char* getCommand(typeCommand *command) {
             if(length <= 15 && input == '\n')
               valid = TRUE;
             else {
-              printf("El nombre es deasiado largo!\n");
+              printf("¡El nombre es demasiado largo!\n");
               while(getchar() != '\n'); //EMPTY BUFFER
             }
           }
@@ -237,7 +237,7 @@ char* getCommand(typeCommand *command) {
         while(getchar() != '\n');//EMPTY BUFFER
 
       if(!valid)
-        printf("Respuesta inválida, ingrese s para si o n para no: ");
+        printf("Respuesta inválida, ingrese s para sí o n para no: ");
     }
   }
 

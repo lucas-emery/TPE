@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
+#include <errno.h>
+#include <error.h>
 #include "getnum.h"
 #include "blobsBack.h"
 #include "random.h"
@@ -120,7 +123,8 @@ int main(int argc, char **argv) {
 				break;
 
 			case SAVE:
-				printf("Game %s saved!", filename); //SPACEHOLDER
+				save(filename, vsAI, player, &board);
+				printf("\nGame %s saved!", filename); //SPACEHOLDER
 				while(getchar() != '\n');
 				if(filename[-1] == 'T')
 					state = MENU;
@@ -202,8 +206,28 @@ void render(typeBoard* board, const int blobCount[],int player){
 
 }
 
-int save(/*...WIP...*/) /* ERROR HANDLING: DEVUELVE SI HUBO UN PROBLEMA AL GUARDAR */
-;
+int save(char *filename, int mode, int player, typeBoard *board){
+
+	errno = 0;
+	
+	FILE *ptr;
+
+    typeSave rec = {mode, player, board -> h, board -> w}; /* Falta recorrer los 2 blobs y guardarlas fichas que tiene cada uno y por último las A y Z, el load es al revés, ya lo aprendé :) */
+
+	ptr = fopen(filename,"wb");
+	
+	if (ptr == NULL)
+	{
+		printf("Error al abrir el archivo.\n");
+		printf("Error %d \n", errno);
+		return 1;
+	}
+
+	fwrite(&rec, sizeof(typeSave), 1, ptr);
+
+	fclose(ptr);
+}
+
 int load(/*...WIP...*/)  /* ERROR HANDLING: DEVUELVE SI HUBO UN PROBLEMA AL CARGAR, EJ. CORRUPTO O NO EXISTE */
 ;
 
