@@ -134,51 +134,23 @@ void render(typeBoard* board, const int blobCount[],int player){
 
   CLEAR_SCREEN;
 
-	scrWidth = board->w*2 + 9;
+	scrWidth = board->w*2 + 7;
 
-	char *top = malloc((scrWidth+1)*sizeof(char));
-	char *frame = malloc((scrWidth+1)*sizeof(char));
-	char *bottom = malloc((scrWidth+1)*sizeof(char));
+	printf(POINTS1":%d", blobCount[1]);
 
-	top[0] = '\201'; //╔
-	for(i = 1; i < scrWidth-1 ; i++)
-		top[i] = '\205'; //═
-	top[scrWidth-1] = '\187'; //╗
-	top[scrWidth] = '\0';
-
-	frame[0] = '\186'; //║
-	for(i = 1; i < scrWidth-1 ; i++)
-		frame[i] = ' ';
-	frame[scrWidth-1] = '\186'; //║
-	frame[scrWidth] = '\0';
-
-	bottom[0] = '\200'; //╚
-	for(i = 1; i < scrWidth-1 ; i++)
-		bottom[i] = '\205'; //═
-	bottom[scrWidth-1] = '\188'; //╝
-	bottom[scrWidth] = '\0';
-
-	printf("%s\n", top);
-
-	space = scrWidth - 10;
+	space = scrWidth - 8;
 	if(blobCount[1] > 10)
 		space--;
 	if(blobCount[2] > 10)
 		space--;
 
-	char *spacer = malloc((space+1)*sizeof(char));
 	for(i = 0; i < space; i++)
-		spacer[i] = ' ';
-	spacer[space] = '\0';
+		putchar(' ');
 
-  printf("\186"POINTS1":%d%s"POINTS2":%d\186\n", blobCount[1], spacer, blobCount[2]);
-
-	free(spacer);
-
-	printf("%s\n", frame);
+  printf(POINTS2":%d\n\n", blobCount[2]);
 
   for(i = 0; i < board->h; i++){
-		printf("\186   ");
+		printf("   ");
     for(j = 0; j < board->w; j++)
     {
       switch(board->get[i][j].owner){
@@ -196,69 +168,20 @@ void render(typeBoard* board, const int blobCount[],int player){
           break;
       }
     }
-    printf("|   \186\n");
+    printf("|\n\n");
   }
 
-	printf("%s\n", frame);
-
-	space = (scrWidth - 10)/2;
-	spacer = malloc((space+1)*sizeof(char));
+	space = (scrWidth - 8)/2;
 	for(i = 0; i < space; i++)
-		spacer[i] = ' ';
-	spacer[space] = '\0';
+		putchar(' ');
 
   if(player==1){
-  	printf("\186%sturno: "PLAYER1" %s\186\n", spacer, spacer);
+  	printf("turno: "PLAYER1"\n");
   }
   else if(player == 2){
-  	printf("\186%sturno: "PLAYER1" %s\186\n", spacer, spacer);
+  	printf("turno: "PLAYER2"\n\n");
   }
 
-}
-
-void renderOld(typeBoard* board, const int blobCount[],int player){
-
-  CLEAR_SCREEN;
-
-  int i,j;
-  //printf("P1:%d\tP2:%d\n", blobCount[1], blobCount[2]);
-  if(player==1){
-  	printf(POINTS1":%d\tP2:%d\n", blobCount[1], blobCount[2]);
-  }
-  else if(player == 2){
-  	printf("P1:%d\t"POINTS2":%d\n", blobCount[1], blobCount[2]);
-  }
-	else {
-		printf(POINTS1":%d\t"POINTS2":%d\n", blobCount[1], blobCount[2]);
-	}
-
-  for(i=0;i < board->h;i++){
-    for(j=0;j < board->w;j++)
-    {
-      switch(board->get[i][j].owner){
-
-        case 0:
-          printf("| ");
-          break;
-
-        case 1:
-          printf("|"PLAYER1);
-          break;
-
-        case 2:
-          printf("|"PLAYER2);
-          break;
-      }
-    }
-
-    printf("|\n"); //prueba
-  }
-  if(player==1){
-  	printf("turno : "PLAYER1"\n");
-  }
-  else if(player == 2){
-  	printf("turno : "PLAYER2"\n");
-  }
 }
 
 int save(/*...WIP...*/) /* ERROR HANDLING: DEVUELVE SI HUBO UN PROBLEMA AL GUARDAR */
