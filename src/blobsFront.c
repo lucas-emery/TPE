@@ -168,15 +168,16 @@ void render(typeBoard* board, const int blobCount[],int player){
           break;
       }
     }
-    printf("|\n\n");
+    printf("|\n");
   }
 
+	putchar('\n');
 	space = (scrWidth - 8)/2;
 	for(i = 0; i < space; i++)
 		putchar(' ');
 
   if(player==1){
-  	printf("turno: "PLAYER1"\n");
+  	printf("turno: "PLAYER1"\n\n");
   }
   else if(player == 2){
   	printf("turno: "PLAYER2"\n\n");
