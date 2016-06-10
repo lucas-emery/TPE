@@ -129,8 +129,94 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
-
 void render(typeBoard* board, const int blobCount[],int player){
+	int i, j, scrWidth, space;
+
+  CLEAR_SCREEN;
+
+	scrWidth = board->w*2 + 9;
+
+	char *top = malloc((scrWidth+1)*sizeof(char));
+	char *frame = malloc((scrWidth+1)*sizeof(char));
+	char *bottom = malloc((scrWidth+1)*sizeof(char));
+
+	top[0] = '\201'; //╔
+	for(i = 1; i < scrWidth-1 ; i++)
+		top[i] = '\205'; //═
+	top[scrWidth-1] = '\187'; //╗
+	top[scrWidth] = '\0';
+
+	frame[0] = '\186'; //║
+	for(i = 1; i < scrWidth-1 ; i++)
+		frame[i] = ' ';
+	frame[scrWidth-1] = '\186'; //║
+	frame[scrWidth] = '\0';
+
+	bottom[0] = '\200'; //╚
+	for(i = 1; i < scrWidth-1 ; i++)
+		bottom[i] = '\205'; //═
+	bottom[scrWidth-1] = '\188'; //╝
+	bottom[scrWidth] = '\0';
+
+	printf("%s\n", top);
+
+	space = scrWidth - 10;
+	if(blobCount[1] > 10)
+		space--;
+	if(blobCount[2] > 10)
+		space--;
+
+	char *spacer = malloc((space+1)*sizeof(char));
+	for(i = 0; i < space; i++)
+		spacer[i] = ' ';
+	spacer[space] = '\0';
+
+  printf("\186"POINTS1":%d%s"POINTS2":%d\186\n", blobCount[1], spacer, blobCount[2]);
+
+	free(spacer);
+
+	printf("%s\n", frame);
+
+  for(i = 0; i < board->h; i++){
+		printf("\186   ");
+    for(j = 0; j < board->w; j++)
+    {
+      switch(board->get[i][j].owner){
+
+        case 0:
+          printf("| ");
+          break;
+
+        case 1:
+          printf("|"PLAYER1);
+          break;
+
+        case 2:
+          printf("|"PLAYER2);
+          break;
+      }
+    }
+    printf("|   \186\n");
+  }
+
+	printf("%s\n", frame);
+
+	space = (scrWidth - 10)/2;
+	spacer = malloc((space+1)*sizeof(char));
+	for(i = 0; i < space; i++)
+		spacer[i] = ' ';
+	spacer[space] = '\0';
+
+  if(player==1){
+  	printf("\186%sturno: "PLAYER1" %s\186\n", spacer, spacer);
+  }
+  else if(player == 2){
+  	printf("\186%sturno: "PLAYER1" %s\186\n", spacer, spacer);
+  }
+
+}
+
+void renderOld(typeBoard* board, const int blobCount[],int player){
 
   CLEAR_SCREEN;
 
@@ -173,9 +259,6 @@ void render(typeBoard* board, const int blobCount[],int player){
   else if(player == 2){
   	printf("turno : "PLAYER2"\n");
   }
-
-	printf("┌─┬─┐\n│O│ │\n├─┼─┤\n└─┴─┘\n");
-
 }
 
 int save(/*...WIP...*/) /* ERROR HANDLING: DEVUELVE SI HUBO UN PROBLEMA AL GUARDAR */
