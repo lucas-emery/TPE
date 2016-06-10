@@ -7,7 +7,6 @@
 #define DECREMENT -1
 
 typedef enum {CMD_START, CMD_MOVE, CMD_SAVE, CMD_QUIT, CMD_RESET} getCmdState;
-typedef enum {GETSOURCE, GETTARGET} AIstate;
 typedef enum {EAT, MOVE} mapType;
 
 void init(typeBoard *board){

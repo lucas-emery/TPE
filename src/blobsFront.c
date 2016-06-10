@@ -5,16 +5,20 @@
 #include "blobsBack.h"
 #include "random.h"
 #ifdef _WIN32
-	#define PLAYER1 "A"
-	#define PLAYER2 "Z"
-	#define POINTS1 "P1"
-	#define POINTS2 "P2"
+	#define BLOB1 "A"
+	#define BLOB2 "Z"
+	#define POINTS1 "J1"
+	#define POINTS2 "J2"
+	#define PLAYER1 "Jugador1"
+	#define PLAYER2 "Jugador2"
 	#define CLEAR_SCREEN system("cls")
 #else
-	#define POINTS1 "\x1b[36;1mP1\x1b[0m"
-	#define POINTS2 "\x1b[31;1mP2\x1b[0m"
-	#define PLAYER1 "\x1b[36;1mO\x1b[0m" //Blue
-	#define PLAYER2 "\x1b[31;1mO\x1b[0m" //Red
+	#define BLOB1 "\x1b[36;1mO\x1b[0m" //Blue
+	#define BLOB2 "\x1b[31;1mO\x1b[0m" //Red
+	#define POINTS1 "\x1b[36;1mJ1\x1b[0m"
+	#define POINTS2 "\x1b[31;1mJ2\x1b[0m"
+	#define PLAYER1 "\x1b[36;1mJugador1\x1b[0m"
+	#define PLAYER2 "\x1b[31;1mJugador2\x1b[0m"
 	#define CLEAR_SCREEN system("clear")
 #endif
 
@@ -73,8 +77,6 @@ int main(int argc, char **argv) {
 					state = QUIT;
 				else
 					printf("Opción invalida\n");
-
-				printf("STATE == %d\n",state);
 
 				break;
 
@@ -175,11 +177,11 @@ void render(typeBoard* board, const int blobCount[],int player){
           break;
 
         case 1:
-          printf("|"PLAYER1);
+          printf("|"BLOB1);
           break;
 
         case 2:
-          printf("|"PLAYER2);
+          printf("|"BLOB2);
           break;
       }
     }
@@ -187,15 +189,15 @@ void render(typeBoard* board, const int blobCount[],int player){
   }
 
 	putchar('\n');
-	space = (scrWidth - 8)/2;
+	space = (scrWidth - 15)/2;
 	for(i = 0; i < space; i++)
 		putchar(' ');
 
   if(player==1){
-  	printf("turno: "PLAYER1"\n\n");
+  	printf("Turno: "PLAYER1"\n\n");
   }
   else if(player == 2){
-  	printf("turno: "PLAYER2"\n\n");
+  	printf("Turno: "PLAYER2"\n\n");
   }
 
 }
