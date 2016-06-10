@@ -79,7 +79,9 @@ int main(int argc, char **argv) {
 						printf("gotAImove\n");
 					}
 					else {
-						//IMPRIMIR TURNO Y COMANDOS DISPONIBLES
+						printf("Para moverse:        [f1,c1][f2,c2]\n"
+									 "Para guardar:        save nombreDelArchivo\n"
+									 "Para volver al menu: quit\n");
 						do {
 							retValue = getCommand(&command);
 							if(retValue != NULL) {
@@ -108,7 +110,10 @@ int main(int argc, char **argv) {
 			case SAVE:
 				printf("Game %s saved!", filename); //SPACEHOLDER
 				while(getchar() != '\n');
-				state = GAME;
+				if(filename[-1] == 'T')
+					state = MENU;
+				else
+					state = GAME;
 				break;
 
 			case LOAD:
@@ -119,7 +124,7 @@ int main(int argc, char **argv) {
 			case END:
 				winner = endGame(&board, blobCount);
 				render(&board, blobCount, 0);
-				printf("Player %d won!\nPress enter to go back to menu\n", winner);
+				printf("Ganó el jugador %d!\n\nPresione enter para volver al menu\n", winner);
 				while(getchar() != '\n');
 				state = MENU;
 				break;

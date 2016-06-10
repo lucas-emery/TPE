@@ -71,6 +71,8 @@ char* getCommand(typeCommand *command) {
     command->target.x = -1;
     command->target.y = -1;
 
+    printf("\nIngrese un comando: ");
+
     while((input = getchar()) != '\n') {
       switch(state) {
         case CMD_START:
@@ -127,15 +129,18 @@ char* getCommand(typeCommand *command) {
         case CMD_SAVE:
           if(pattern[i] == 'F') {
             if(length < 15) {
-              if(output == NULL)
-                output = (char*) malloc(16*sizeof(char)); //Extra space for \0
+              if(output == NULL) {
+                output = (char*) malloc(17*sizeof(char)); //Extra space for \0 && not quit command
+                output[0] = 'F'; //False
+                output++;
+              }
               output[length] = input;
               length++;
               valid = TRUE;
             }
             else {
               valid = FALSE;
-              printf("Filename too long, max length is 15 - ");
+              printf("La máxima longitud para el nombre del archivo es 15 - ");
               state = CMD_RESET;
             }
           }
@@ -167,21 +172,23 @@ char* getCommand(typeCommand *command) {
     }
 
     if(!valid) {
-      printf("Invalid command\n");
+      printf("Comando Inválido\n");
       free(output);
     }
   }
 
   if(output != NULL && *output == EOF) {
-    printf("Do you want to save before quitting?(y/n): ");
+    printf("Desea guardar antes de salir?(s/n): ");
     valid = FALSE;
     while(!valid) {
       input = getchar();
       if(getchar() == '\n') {
-        if(input == 'y') {
-          output = (char*) realloc(output, 16*sizeof(char)); //Extra space for \0
+        if(input == 's') {
+          output = (char*) realloc(output, 17*sizeof(char)); //Extra space for \0 && quit command
+          output[0] = 'T'; //True
+          output++;
           while(!valid) {
-            printf("Enter filename(max 15): ");
+            printf("Ingrese un nombre para el archivo(max 15): ");
             length = 0;
             while(length < 15 && (input = getchar()) != '\n') {
               output[length] = input;
@@ -190,7 +197,7 @@ char* getCommand(typeCommand *command) {
             if(length <= 15 && input == '\n')
               valid = TRUE;
             else {
-              printf("Filename too long!\n");
+              printf("El nombre es deasiado largo!\n");
               while(getchar() != '\n'); //EMPTY BUFFER
             }
           }
@@ -202,7 +209,7 @@ char* getCommand(typeCommand *command) {
         while(getchar() != '\n');//EMPTY BUFFER
 
       if(!valid)
-        printf("Invalid answer, enter 'y' for yes or 'n' for no: ");
+        printf("Respuesta inválida, ingrese s para si o n para no: ");
     }
   }
 
@@ -226,23 +233,23 @@ int isInside(int x, int y, int w, int h) {
 
 int validCommand(int player, typeCommand *command, typeBoard *board) {
   if(!isInside(command->source.x, command->source.y, board->w, board->h)) {
-    printf("Invalid command, [%d,%d] doesn't exist!\n", command->source.y+1, command->source.x+1);
+    printf("Comando inválido, [%d,%d] no existe!\n", command->source.y+1, command->source.x+1);
     return FALSE;
   }
   else if(!isInside(command->target.x, command->target.y, board->w, board->h)) {
-    printf("Invalid command, [%d,%d] doesn't exist!\n", command->target.y+1, command->target.x+1);
+    printf("Comando inválido, [%d,%d] no existe!\n", command->target.y+1, command->target.x+1);
     return FALSE;
   }
   else if(board->get[command->source.y][command->source.x].owner != player) {
-    printf("Invalid command, [%d,%d] isn't yours!\n", command->source.y+1, command->source.x+1);
+    printf("Comando inválido, [%d,%d] no es tuyo!\n", command->source.y+1, command->source.x+1);
     return FALSE;
   }
   else if(abs(command->source.x - command->target.x) > 2 || abs(command->source.y - command->target.y) > 2) {
-    printf("Invalid command, [%d,%d] can't move that far!\n", command->source.y+1, command->source.x+1);
+    printf("Comando inválido, [%d,%d] no se puede mover tan lejos!\n", command->source.y+1, command->source.x+1);
     return FALSE;
   }
   else if(board->get[command->target.y][command->target.x].owner != 0) {
-    printf("Invalid command, [%d,%d] isn't empty!\n", command->target.y+1, command->target.x+1);
+    printf("Comando inválido, [%d,%d] no está vacio!\n", command->target.y+1, command->target.x+1);
     return FALSE;
   }
   else
