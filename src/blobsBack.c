@@ -383,54 +383,27 @@ void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]
 }
 
 void getAImove(typeCommand *command, typeBoard *board) {
-  int i = 0, j = 0, minX, maxX, minY, maxY;
+  int i, j, k, l, minX, maxX, minY, maxY, override, sameScoreMoves;
   typeCommand bestMove;
-  typeCoord newMove;
   int bestScore = -1, isBMmitosis = 0, isMitosis;
-  AIstate state = GETSOURCE;
 
-  //bestMove.source.x = -1; //Signal that bestMove is empty
+  for(i = 0; i < board->h; i++) {
+    for(j = 0; j < board->w; j++) {
+      if(board->get[i][j].owner == AIPLAYER && board->get[i][j].canMove) {
+        minY = i - 2;
+        maxY = i + 2;
+        minX = j - 2;
+        maxX = j + 2;
 
-  int searching = TRUE;
-  while(searching) {
-    switch(state) {
-      case GETSOURCE:
-      //FOR WITH BREAK LOOP??
-        if(i == board->h) {
-          searching = FALSE;
-        }
-        else {
-          if(board->get[i][j].owner == AIPLAYER && board->get[i][j].canMove) {
-            newMove.x = j;
-            newMove.y = i;
-            state = GETTARGET;
-            printf("GotSource [%d,%d]", i, j);
-          }
-
-          j++;
-          if(j == board->w) {
-            j = 0;
-            i++;
-          }
-        }
-        break;
-
-      case GETTARGET:
-        minX = newMove.x-2;
-        maxX = newMove.x+2;
-        minY = newMove.y-2;
-        maxY = newMove.y+2;
-
-        if(minX < 0)
-          minX = 0;
-        else if(maxX >= board->w)
-          maxX = board->w - 1;
         if(minY < 0)
           minY = 0;
         else if(maxY >= board->h)
           maxY = board->h - 1;
+        if(minX < 0)
+          minX = 0;
+        else if(maxX >= board->w)
+          maxX = board->w - 1;
 
-        int k, l, override, sameScoreMoves;
         for(k = minY; k <= maxY; k++) {
           for(l = minX; l <= maxX; l++) {
             if(board->get[k][l].owner == 0) {
@@ -439,11 +412,11 @@ void getAImove(typeCommand *command, typeBoard *board) {
               if(board->get[k][l].canEat > bestScore) {
                 override = TRUE;
                 sameScoreMoves = 1;
-                if(abs(newMove.x - l) == 1 && abs(newMove.y - k) == 1)
+                if(abs(i - k) == 1 && abs(j - l) == 1)
                   isMitosis = TRUE;
               }
               else if(board->get[k][l].canEat == bestScore) {
-                if(abs(newMove.x - l) == 1 && abs(newMove.y - k) == 1)
+                if(abs(i - k) == 1 && abs(j - l) == 1)
                   isMitosis = TRUE;
                 if(!isBMmitosis && isMitosis) {
                   override = TRUE;
@@ -457,22 +430,19 @@ void getAImove(typeCommand *command, typeBoard *board) {
               }
 
               if(override) {
-                bestMove.source.x = newMove.x;
-                bestMove.source.y = newMove.y;
-                bestMove.target.x = l;
+                bestMove.source.y = i;
+                bestMove.source.x = j;
                 bestMove.target.y = k;
+                bestMove.target.x = l;
                 bestScore = board->get[k][l].canEat;
                 isBMmitosis = isMitosis;
-                printf("GotTarget [%d,%d]", k, l);
               }
             }
           }
         }
-        state = GETSOURCE;
-        break;
+      }
     }
   }
-  getchar();
   *command = bestMove;
 }
 
