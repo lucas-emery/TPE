@@ -3,7 +3,6 @@
 #include <time.h>
 #include "getnum.h"
 #include "blobsBack.h"
-#include "random.h"
 #ifdef _WIN32
 	#define PLAYER1 "A"
 	#define PLAYER2 "Z"

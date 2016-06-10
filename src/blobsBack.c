@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "blobsBack.h"
+#include <math.h>
 
 typedef enum {GETSOURCE, GETTARGET} AIstate;
 
@@ -91,17 +92,19 @@ void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
         /*printf("=i:%d=j:%d=mY:%d=MY:%d=mX:%d=MX:%d=\n",i,j,minY,maxY,minX,maxX);*/
         for(k = minY; k <= maxY; k++ ){
           for(l = minX; l <= maxX; l++){
-            if
+
             if(board->get[k][l].owner == 0){
               board->get[i][j].canMove++;
             }
-            else if(board->get[k][l].owner == 1)
-              ;
-            else (board->get[k][l].owner == 2)
-              ;
+            else if((board->get[k][l].owner == 1) && (abs(i-k) < 2 && abs(j-l) < 2) )
+              board->get[i][j].canEat++;   
           }
         }
 
+        if(board->get[i][j].owner == 0)
+        board->get[i][j].canMove--;
+        if(board->get[i][j].owner == 1)
+        board->get[i][j].canEat--;
       }
     }
 
