@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include "blobsBack.h"
+
+#define INCREMENT 1
+#define DECREMENT -1
 
 typedef enum {CMD_START, CMD_MOVE, CMD_SAVE, CMD_QUIT, CMD_RESET} getCmdState;
 typedef enum {GETSOURCE, GETTARGET} AIstate;
+typedef enum {EAT, MOVE} mapType;
 
 void init(typeBoard *board){
   typeBlob *temp;
@@ -38,6 +43,30 @@ void fill(typeBoard * board){ //prueba para el switch
     }
     else
       board->get[i][j].owner = 0;
+    }
+  }
+}
+
+void fillEatAndMove(typeBoard *board) {
+  int moveMap[6][6] = {{8,10,13,13,10,8},
+                       {10,14,18,18,14,10},
+                       {13,18,23,23,18,13},
+                       {13,18,23,23,18,13},
+                       {10,14,18,18,14,10},
+                       {8,10,13,13,10,8}};
+
+  int eatMap[6][6] = {{0,1,0,0,0,0},
+                      {1,1,0,0,0,0},
+                      {0,0,0,0,0,0},
+                      {0,0,0,0,0,0},
+                      {1,1,0,0,0,0},
+                      {0,1,0,0,0,0}};
+
+  int i, j;
+  for (i = 0; i < board->h; i++) {
+    for (j = 0; j < board->w; j++) {
+      board->get[i][j].canMove = moveMap[i][j];
+      board->get[i][j].canEat = eatMap[i][j];
     }
   }
 }
@@ -256,10 +285,55 @@ int validCommand(int player, typeCommand *command, typeBoard *board) {
     return TRUE;
 }
 
+//Action must be INCREMENT or DECREMENT
+void updateMap(typeCoord center, typeBoard *board, mapType type, int action) {
+  int minX, maxX, minY, maxY, radius;
+  size_t offset;
+
+  if(type == EAT) {
+    radius = 1;
+    offset = offsetof(typeBlob, canEat);
+  }
+  else {
+    radius = 2;
+    offset = offsetof(typeBlob, canMove);
+  }
+
+  minX = center.x - radius;
+  maxX = center.x + radius;
+  minY = center.y - radius;
+  maxY = center.y + radius;
+
+  if(minX < 0)
+    minX = 0;
+  else if(maxX >= board->w)
+    maxX = board->w - 1;
+  if(minY < 0)
+    minY = 0;
+  else if(maxY >= board->h)
+    maxY = board->h - 1;
+
+  int i, j;
+  for(i = minY; i <= maxY; i++) {
+    for(j = minX; j <= maxX; j++) {
+      *((int*)(((size_t)&board->get[i][j])+offset)) += action; //Equals typeBlob.canEat or typeBlob.canMove
+    }
+  }
+
+  //Correct outside loop to halve comparisons
+  *((int*)(((size_t)&board->get[center.y][center.x])+offset)) -= action; //Equals typeBlob.canEat or typeBlob.canMove
+}
+
 int move(int player, typeCommand *command, typeBoard *board) {
   board->get[command->target.y][command->target.x].owner = player;
+  updateMap(command->target, board, MOVE, DECREMENT);
+  if(player != AIPLAYER)
+    updateMap(command->target, board, EAT, INCREMENT);
   if(abs(command->source.x - command->target.x) == 2 || abs(command->source.y - command->target.y) == 2) {
     board->get[command->source.y][command->source.x].owner = 0;
+    updateMap(command->source, board, MOVE, INCREMENT);
+    if(player != AIPLAYER)
+      updateMap(command->source, board, EAT, DECREMENT);
     return FALSE;
   }
   return TRUE;
@@ -267,6 +341,7 @@ int move(int player, typeCommand *command, typeBoard *board) {
 
 void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]) {
   int otherPlayer, minX, maxX, minY, maxY;
+  typeCoord coord;
   if(player == 1)
     otherPlayer = 2;
   else
@@ -286,13 +361,22 @@ void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]
   else if(maxY >= board->h)
     maxY = board->h - 1;
 
-  int i, j;
+  int i, j, action;
   for(i = minY; i <= maxY; i++) {
     for(j = minX; j <= maxX; j++) {
       if(board->get[i][j].owner == otherPlayer) {
         board->get[i][j].owner = player;
         blobCount[player]++;
         blobCount[otherPlayer]--;
+
+        if(player == AIPLAYER)
+          action = DECREMENT;
+        else
+          action = INCREMENT;
+
+        coord.y = i;
+        coord.x = j;
+        updateMap(coord, board, EAT, action);
       }
     }
   }
@@ -302,10 +386,10 @@ void getAImove(typeCommand *command, typeBoard *board) {
   int i = 0, j = 0, minX, maxX, minY, maxY;
   typeCommand bestMove;
   typeCoord newMove;
-  int bestScore = 0, isBMmitosis = 0, isMitosis;
-  AIstate state;
+  int bestScore = -1, isBMmitosis = 0, isMitosis;
+  AIstate state = GETSOURCE;
 
-  bestMove.source.x = -1; //Signal that bestMove is empty
+  //bestMove.source.x = -1; //Signal that bestMove is empty
 
   int searching = TRUE;
   while(searching) {
@@ -320,6 +404,7 @@ void getAImove(typeCommand *command, typeBoard *board) {
             newMove.x = j;
             newMove.y = i;
             state = GETTARGET;
+            printf("GotSource [%d,%d]", i, j);
           }
 
           j++;
@@ -349,6 +434,8 @@ void getAImove(typeCommand *command, typeBoard *board) {
         for(k = minY; k <= maxY; k++) {
           for(l = minX; l <= maxX; l++) {
             if(board->get[k][l].owner == 0) {
+              override = FALSE;
+              isMitosis = FALSE;
               if(board->get[k][l].canEat > bestScore) {
                 override = TRUE;
                 sameScoreMoves = 1;
@@ -374,15 +461,18 @@ void getAImove(typeCommand *command, typeBoard *board) {
                 bestMove.source.y = newMove.y;
                 bestMove.target.x = l;
                 bestMove.target.y = k;
+                bestScore = board->get[k][l].canEat;
                 isBMmitosis = isMitosis;
+                printf("GotTarget [%d,%d]", k, l);
               }
             }
           }
         }
+        state = GETSOURCE;
         break;
     }
   }
-
+  getchar();
   *command = bestMove;
 }
 

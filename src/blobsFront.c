@@ -22,11 +22,19 @@ int main(int argc, char **argv) {
 
 	int blobCount[3] = {0,2,2};
 	typeBoard board;
-	printf("La matriz:\n");
-	board.h = getint("Ingrese altura:\n");
-	board.w = getint("Ingrese ancho:\n");
+	if(argc > 1 && argv[1][0] == 'd') {
+		board.h = 6;
+		board.w = 6;
+	}
+	else {
+		printf("La matriz:\n");
+		board.h = getint("Ingrese altura:\n");
+		board.w = getint("Ingrese ancho:\n");
+	}
 	init(&board);
 	fill(&board);
+	if(argc > 1 && argv[1][0] == 'd')
+		fillEatAndMove(&board);
 
 	gameState state = MENU;
 	typeCommand command;
@@ -73,6 +81,8 @@ int main(int argc, char **argv) {
 			case GAME:
 				//Generate board if not loaded (wip) or ¿loaded ended?
 				render(&board, blobCount, player);
+				if(argc > 1 && argv[1][0] == 'd')
+					renderMaps(&board);
 				if(canMove(player, &board)) {
 					if(vsAI && player == AIPLAYER) {
 						getAImove(&command, &board);
@@ -194,3 +204,19 @@ int save(/*...WIP...*/) /* ERROR HANDLING: DEVUELVE SI HUBO UN PROBLEMA AL GUARD
 ;
 int load(/*...WIP...*/)  /* ERROR HANDLING: DEVUELVE SI HUBO UN PROBLEMA AL CARGAR, EJ. CORRUPTO O NO EXISTE */
 ;
+
+void renderMaps(typeBoard *board) {
+	int i, j;
+	for (i = 0; i < board->h; i++) {
+    for (j = 0; j < board->w; j++) {
+			printf("|%d",board->get[i][j].canMove);
+		}
+		printf("|\n");
+	}
+	for (i = 0; i < board->h; i++) {
+    for (j = 0; j < board->w; j++) {
+			printf("|%d",board->get[i][j].canEat);
+		}
+		printf("|\n");
+	}
+}
