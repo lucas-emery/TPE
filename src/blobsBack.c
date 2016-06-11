@@ -11,7 +11,7 @@
 typedef enum {CMD_START, CMD_MOVE, CMD_SAVE, CMD_QUIT, CMD_RESET} getCmdState;
 typedef enum {EAT, MOVE} mapType;
 
-void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
+int init(typeBoard *board, char **loadedArray){
 
   typeBlob *temp;
   int i,j,k,l,minX,minY,maxX,maxY;
@@ -22,51 +22,43 @@ void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
     board->h = getint("Ingrese altura:\n");
     board->w = getint("Ingrese ancho:\n");
 
-  }else {
-    board->h = dimy;
-    board->w = dimx;
   }
 
   if((board->get = (typeBlob**) malloc(board->h * sizeof(typeBlob*))) == NULL){
-    printf("Error de memoria\n");
+    printf("No hay suficiente espacio en el Heap\n");
+    return 0;
   }
-  temp = (typeBlob*) malloc(board->h * board->w * sizeof(typeBlob));
-  if(temp == NULL)
+
+  if((temp = (typeBlob*) malloc(board->h * board->w * sizeof(typeBlob))) == NULL)
   {
-    printf("Error de memoria\n");
-  }
-  else
-  {
-    for (i = 0; i < board->h; i++) {
-        board->get[i] = temp + (i * board->w);
-    }
+    printf("No hay suficiente espacio en el Heap\n");
+    free(board->get);
+    return 0;
   }
 
+  for (i = 0; i < board->h; i++) {
+    board->get[i] = temp + (i * board->w);
+  }
 
 
-  if(loadedArray==NULL){
-
+  if(loadedArray == NULL){
     fill(board);
-
   }
   else{
-
-    for(i = 0 ; i < dimx-1 ; i++){
-      for(j = 0 ; j < dimy-1 ; j++){
+    for(i = 0 ; i < board->h ; i++){
+      for(j = 0 ; j < board->w ; j++){
         switch(loadedArray[i][j]){
-
           case '0':
-          board->get[i][j].owner = 0;
-          break;
+            board->get[i][j].owner = 0;
+            break;
 
           case 'A':
-          board->get[i][j].owner = 1;
-          break;
+            board->get[i][j].owner = 1;
+            break;
 
           case 'Z':
-          board->get[i][j].owner = 2;
-          break;
-
+            board->get[i][j].owner = 2;
+            break;
         }
       }
     }
@@ -98,7 +90,7 @@ void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
         /*printf("=i:%d=j:%d=mY:%d=MY:%d=mX:%d=MX:%d=\n",i,j,minY,maxY,minX,maxX);*/
         board->get[i][j].canMove = 0;
         board->get[i][j].canEat = 0;
-        
+
         for(k = minY; k <= maxY; k++ ){
           for(l = minX; l <= maxX; l++){
 
@@ -118,9 +110,7 @@ void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
     }
 
   }
-
-
-
+  return 1;
 }
 
 void fill(typeBoard * board){ //prueba para el switch
@@ -311,11 +301,11 @@ char* getCommand(typeCommand *command) {
           while(!valid) {
             printf("Ingrese un nombre para el archivo (máximo 15 caracteres): ");
             length = 0;
-            while(length < 15 && (input = getchar()) != '\n') {
+            while((input = getchar()) != '\n' && length < 15) {
               output[length] = input;
               length++;
             }
-            if(length <= 15 && input == '\n')
+            if(input == '\n')
               valid = TRUE;
             else {
               printf("¡El nombre es demasiado largo!\n");
@@ -555,4 +545,89 @@ int endGame(typeBoard *board, int blobCount[]) {
     }
   }
   return winner;
+}
+
+char* getFilename() {
+  char *filename = malloc(16 * sizeof(char));
+  int length, valid = FALSE;
+  char input;
+
+  while(!valid) {
+    printf("Ingrese el nombre del archivo (máximo 15 caracteres): ");
+    length = 0;
+    while((input = getchar()) != '\n' && length < 15) {
+      filename[length] = input;
+      length++;
+    }
+    if(input == '\n')
+      valid = TRUE;
+    else {
+      printf("¡El nombre es demasiado largo!\n\n");
+      while(getchar() != '\n'); //EMPTY BUFFER
+    }
+  }
+  filename[length] = '\0';
+
+  return filename;
+}
+
+int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *board, char **loadedArray) {
+	char *temp;
+	int i;
+
+	FILE *file;
+
+	if((file = fopen(filename, "rb")) == NULL) {
+		perror("Error al intentar abrir el archivo");
+		free(filename);
+	}
+	else {
+		free(filename);
+		if(fread(vsAI, sizeof(int), 1, file) < sizeof(int))
+			printf("Error en el formato del archivo");
+		else {
+			if(fread(player, sizeof(int), 1, file) < sizeof(int))
+				printf("Error en el formato del archivo");
+			else {
+				if(fread(&board->h, sizeof(int), 1, file) < sizeof(int))
+					printf("Error en el formato del archivo");
+				else {
+					if(fread(&board->w, sizeof(int), 1, file) < sizeof(int))
+						printf("Error en el formato del archivo");
+					else {
+						if(fread(&blobCount[1], sizeof(int), 2, file) < (sizeof(int)*2))
+							printf("Error en el formato del archivo");
+						else {
+							if((loadedArray = (char**) malloc(board->h * sizeof(char*))) == NULL)
+						    printf("No hay suficiente espacio en el Heap\n");
+							else {
+							  if((temp = (char*) malloc(board->h * board->w * sizeof(char))) == NULL)
+							  {
+							    printf("No hay suficiente espacio en el Heap\n");
+							    free(loadedArray);
+							  }
+								else {
+								  for (i = 0; i < board->h; i++) {
+								    loadedArray[i] = temp + (i * board->w);
+								  }
+
+									if(fread(*loadedArray, sizeof(char), (board->h*board->w), file) < (sizeof(char)*board->h*board->w))
+										printf("Error en el formato del archivo");
+									else {
+										if(fclose(file) == EOF)
+											printf("Error al intentar cerrar el archivo");
+										else
+											return 1;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if(fclose(file) == EOF)
+			perror("Error al intentar cerrar el archivo");
+	}
+	return 0;
 }

@@ -28,8 +28,7 @@ int main(int argc, char **argv) {
 	int blobCount[3] = {0,2,2};
 	typeBoard board;
 	board.get = NULL;
-	char** loadedArray;
-	int dimx = 0, dimy = 0;
+	char** loadedArray = NULL;
 
 	gameState state = MENU;
 	typeCommand command;
@@ -77,9 +76,10 @@ int main(int argc, char **argv) {
 				break;
 
 			case NEWGAME:
-				loadedArray = NULL;
-				init(&board, loadedArray, dimx, dimy);
-				state = GAME;
+				if(init(&board, NULL))
+					state = GAME;
+				else
+					state = QUIT;
 				break;
 
 			case GAME:
@@ -131,11 +131,20 @@ int main(int argc, char **argv) {
 				break;
 
 			case LOAD:
-				//load()
-				//init()
-				printf("loaded\n");
-				getchar();
-				//state = GAME;
+				CLEAR_SCREEN;
+				filename = getFilename();
+				if(load(filename, &vsAI, &player, blobCount, &board, loadedArray)) {
+					if(init(&board, loadedArray)) {
+						printf("Successfully loaded\n"); //For debugging
+						getchar();
+						state = GAME;
+					}
+					state = QUIT;
+				}
+				else
+					printf("\nPresione enter para volver al menu\n");
+					while(getchar() != '\n');
+					state = MENU;
 				break;
 
 			case END:
@@ -217,6 +226,8 @@ int save(char *filename, int mode, int player, typeBoard *board){
 
 	ptr = fopen(filename,"wb");
 
+	free(filename);
+
 	if (ptr == NULL)
 	{
 		printf("Error al abrir el archivo.\n");
@@ -230,9 +241,6 @@ int save(char *filename, int mode, int player, typeBoard *board){
 
 	return 0;
 }
-
-int load(/*...WIP...*/)  /* ERROR HANDLING: DEVUELVE SI HUBO UN PROBLEMA AL CARGAR, EJ. CORRUPTO O NO EXISTE */
-;
 
 void renderMaps(typeBoard *board) {
 	int i, j;
