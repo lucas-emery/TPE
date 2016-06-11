@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include "blobsBack.h"
+#include <math.h>
 
 #define INCREMENT 1
 #define DECREMENT -1
@@ -9,9 +10,22 @@
 typedef enum {CMD_START, CMD_MOVE, CMD_SAVE, CMD_QUIT, CMD_RESET} getCmdState;
 typedef enum {EAT, MOVE} mapType;
 
-void init(typeBoard *board){
+void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
+  
   typeBlob *temp;
-  int i;
+  int i,j,k,l,minX,minY,maxX,maxY;
+
+  if(loadedArray==NULL){
+
+    printf("La matriz:\n");
+    board->h = getint("Ingrese altura:\n");
+    board->w = getint("Ingrese ancho:\n");
+
+  }else {
+    board->h = dimy;
+    board->w = dimx;
+  }
+
   if((board->get = (typeBlob**) malloc(board->h * sizeof(typeBlob*))) == NULL){
     printf("Error de memoria\n");
   }
@@ -26,19 +40,94 @@ void init(typeBoard *board){
         board->get[i] = temp + (i * board->w);
     }
   }
-}
+
+
+
+  if(loadedArray==NULL){
+
+    fill(board);
+
+  }
+  else{
+
+    for(i = 0 ; i < dimx-1 ; i++){
+      for(j = 0 ; j < dimy-1 ; j++){
+        switch(loadedArray[i][j]){
+        
+          case '0':
+          board->get[i][j].owner = 0;
+          break;
+        
+          case 'A':
+          board->get[i][j].owner = 1;
+          break;
+        
+          case 'Z':
+          board->get[i][j].owner = 2;
+          break;
+
+        }
+      }
+    }
+  
+    free(*loadedArray);
+    free(loadedArray);
+  }
+
+
+  for(i = 0 ; i < board->h ; i++){
+    for(j = 0 ; j < board->w ; j++){
+      {
+        minY=i-2;
+        minX=j-2;
+        maxY=i+2;
+        maxX=j+2;
+
+        if( minY < 0 )
+          minY = 0;
+
+        if( maxY > board->h-1 )
+          maxY = board->h-1;
+
+        if( minX < 0)
+          minX = 0;
+
+        if( maxX > board->w-1 )
+          maxX = board->w-1;
+        /*printf("=i:%d=j:%d=mY:%d=MY:%d=mX:%d=MX:%d=\n",i,j,minY,maxY,minX,maxX);*/
+        for(k = minY; k <= maxY; k++ ){
+          for(l = minX; l <= maxX; l++){
+
+            if(board->get[k][l].owner == 0){
+              board->get[i][j].canMove++;
+            }
+            else if((board->get[k][l].owner == 1) && (abs(i-k) < 2 && abs(j-l) < 2) )
+              board->get[i][j].canEat++;   
+          }
+        }
+
+        if(board->get[i][j].owner == 0)
+        board->get[i][j].canMove--;
+        if(board->get[i][j].owner == 1)
+        board->get[i][j].canEat--;
+      }
+    }
+
+  }
+
+
+
+} 
 
 void fill(typeBoard * board){ //prueba para el switch
  int i,j;
- for(i=0; i < board->h; i++){
-  for(j=0; j < board->w ; j++){
+ for( i = 0 ; i < board->h; i++){
+  for( j = 0 ; j < board->w ; j++){
     if ( j == 0 && (i == 0 || i == board->h-1)){
       board->get[i][j].owner = 1;
-      board->get[i][j].canMove = 8;
     }
     else if ( j == board->w-1 && (i == 0 || i == board->h-1)){
       board->get[i][j].owner = 2;
-      board->get[i][j].canMove = 8;
     }
     else
       board->get[i][j].owner = 0;

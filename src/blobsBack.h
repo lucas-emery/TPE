@@ -45,7 +45,7 @@ int validCommand(int player, typeCommand *command, typeBoard *board);
 int move(int player, typeCommand *command, typeBoard *board);
 void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]);
 void render(typeBoard *board, const int *blobCount,int player);
-void init(typeBoard *board);
+void init(typeBoard *board, char **loadedArray, int dimx, int dimy);
 void fill(typeBoard *board);
 void fillEatAndMove(typeBoard *board);
 void renderMaps(typeBoard *board);

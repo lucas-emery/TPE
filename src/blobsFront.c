@@ -6,7 +6,6 @@
 #include <error.h>
 #include "getnum.h"
 #include "blobsBack.h"
-#include "random.h"
 #ifdef _WIN32
 	#define BLOB1 "A"
 	#define BLOB2 "Z"
@@ -29,19 +28,9 @@ int main(int argc, char **argv) {
 
 	int blobCount[3] = {0,2,2};
 	typeBoard board;
-	if(argc > 1 && argv[1][0] == 'd') {
-		board.h = 6;
-		board.w = 6;
-	}
-	else {
-		printf("La matriz:\n");
-		board.h = getint("Ingrese altura:\n");
-		board.w = getint("Ingrese ancho:\n");
-	}
-	init(&board);
-	fill(&board);
-	if(argc > 1 && argv[1][0] == 'd')
-		fillEatAndMove(&board);
+	char** loadedArray = NULL;
+	int dimx=0,dimy=0;
+	init(&board,loadedArray,dimx,dimy);
 
 	gameState state = MENU;
 	typeCommand command;
