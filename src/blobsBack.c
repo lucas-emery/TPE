@@ -96,6 +96,9 @@ void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
         if( maxX > board->w-1 )
           maxX = board->w-1;
         /*printf("=i:%d=j:%d=mY:%d=MY:%d=mX:%d=MX:%d=\n",i,j,minY,maxY,minX,maxX);*/
+        board->get[i][j].canMove = 0;
+        board->get[i][j].canEat = 0;
+        
         for(k = minY; k <= maxY; k++ ){
           for(l = minX; l <= maxX; l++){
 
