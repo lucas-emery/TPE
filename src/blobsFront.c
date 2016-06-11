@@ -3,7 +3,6 @@
 #include <time.h>
 #include <string.h>
 #include <errno.h>
-#include <error.h>
 #include "getnum.h"
 #include "blobsBack.h"
 #ifdef _WIN32
@@ -28,13 +27,13 @@ int main(int argc, char **argv) {
 
 	int blobCount[3] = {0,2,2};
 	typeBoard board;
-	char** loadedArray = NULL;
-	int dimx=0,dimy=0;
-	init(&board,loadedArray,dimx,dimy);
+	board.get = NULL;
+	char** loadedArray;
+	int dimx = 0, dimy = 0;
 
 	gameState state = MENU;
 	typeCommand command;
-	int vsAI, winner; //winner quedo aca porque no puede estar al principio de un case
+	int vsAI, input, winner; //winner quedo aca porque no puede estar al principio de un case
 	char *filename, *retValue;
 	srand(time(NULL));
 	int player = rand()%2 + 1; /* Generate a number between 1 & 2 (0 is not included) */
@@ -43,37 +42,47 @@ int main(int argc, char **argv) {
 		switch(state) {
 			case MENU:
 
+				if(board.get != NULL) {
+					free(*board.get);
+					free(board.get);
+					board.get = NULL;
+				}
 				vsAI=FALSE;
-				int aux=0;
+				input = 0;
+
 				CLEAR_SCREEN;
 				printf("=====Bienvenido al juego Guerra de Manchas (Blob Wars)=====\n"
 						"\t1. Juego de dos jugadores\n"
 						"\t2. Juego contra computadora\n"
         				"\t3. Recuperar un juego guardado\n"
-           				"\t4. Terminar\n\n"
-        				"Elegir opción: ");
+           				"\t4. Terminar\n");
 				do {
-				aux=getint("");
-				CLEAR_SCREEN;
-				} while(!(aux >= 1 && aux <= 4));
+					input = getint("\nElegir opción: ");
 
-				if(aux == 1)
-					state = GAME;
-				else if(aux == 2){
-					state = GAME;
-					vsAI = TRUE;
-				}
-				else if(aux == 3)
-					state = LOAD;
-				else if(aux == 4)
-					state = QUIT;
-				else
-					printf("Opción invalida\n");
+					if(input == 1)
+						state = NEWGAME;
+					else if(input == 2){
+						state = NEWGAME;
+						vsAI = TRUE;
+					}
+					else if(input == 3)
+						state = LOAD;
+					else if(input == 4)
+						state = QUIT;
+					else
+						printf("Opción invalida\n");
+
+					} while(!(input >= 1 && input <= 4));
 
 				break;
 
+			case NEWGAME:
+				loadedArray = NULL;
+				init(&board, loadedArray, dimx, dimy);
+				state = GAME;
+				break;
+
 			case GAME:
-				//Generate board if not loaded (wip) or ¿loaded ended?
 				render(&board, blobCount, player);
 				if(argc > 1 && argv[1][0] == 'd')
 					renderMaps(&board);
@@ -113,7 +122,7 @@ int main(int argc, char **argv) {
 
 			case SAVE:
 				save(filename, vsAI, player, &board);
-				printf("\nGame %s saved!", filename); //SPACEHOLDER
+				printf("\n¡Juego guardado exitosamente en %s!", filename); //SPACEHOLDER
 				while(getchar() != '\n');
 				if(filename[-1] == 'T')
 					state = MENU;
@@ -122,8 +131,11 @@ int main(int argc, char **argv) {
 				break;
 
 			case LOAD:
-				printf("load\n");
+				//load()
+				//init()
+				printf("loaded\n");
 				getchar();
+				//state = GAME;
 				break;
 
 			case END:
@@ -198,13 +210,13 @@ void render(typeBoard* board, const int blobCount[],int player){
 int save(char *filename, int mode, int player, typeBoard *board){
 
 	errno = 0;
-	
+
 	FILE *ptr;
 
     typeSave rec = {mode, player, board -> h, board -> w}; /* Falta recorrer los 2 blobs y guardarlas fichas que tiene cada uno y por último las A y Z, el load es al revés, ya lo aprendé :) */
 
 	ptr = fopen(filename,"wb");
-	
+
 	if (ptr == NULL)
 	{
 		printf("Error al abrir el archivo.\n");
@@ -215,6 +227,8 @@ int save(char *filename, int mode, int player, typeBoard *board){
 	fwrite(&rec, sizeof(typeSave), 1, ptr);
 
 	fclose(ptr);
+
+	return 0;
 }
 
 int load(/*...WIP...*/)  /* ERROR HANDLING: DEVUELVE SI HUBO UN PROBLEMA AL CARGAR, EJ. CORRUPTO O NO EXISTE */

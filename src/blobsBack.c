@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include "blobsBack.h"
 #include <math.h>
+#include "getnum.h"
+#include "blobsBack.h"
 
 #define INCREMENT 1
 #define DECREMENT -1
@@ -11,7 +12,7 @@ typedef enum {CMD_START, CMD_MOVE, CMD_SAVE, CMD_QUIT, CMD_RESET} getCmdState;
 typedef enum {EAT, MOVE} mapType;
 
 void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
-  
+
   typeBlob *temp;
   int i,j,k,l,minX,minY,maxX,maxY;
 
@@ -53,15 +54,15 @@ void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
     for(i = 0 ; i < dimx-1 ; i++){
       for(j = 0 ; j < dimy-1 ; j++){
         switch(loadedArray[i][j]){
-        
+
           case '0':
           board->get[i][j].owner = 0;
           break;
-        
+
           case 'A':
           board->get[i][j].owner = 1;
           break;
-        
+
           case 'Z':
           board->get[i][j].owner = 2;
           break;
@@ -69,7 +70,7 @@ void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
         }
       }
     }
-  
+
     free(*loadedArray);
     free(loadedArray);
   }
@@ -102,7 +103,7 @@ void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
               board->get[i][j].canMove++;
             }
             else if((board->get[k][l].owner == 1) && (abs(i-k) < 2 && abs(j-l) < 2) )
-              board->get[i][j].canEat++;   
+              board->get[i][j].canEat++;
           }
         }
 
@@ -117,7 +118,7 @@ void init(typeBoard *board, char **loadedArray, int dimx, int dimy){
 
 
 
-} 
+}
 
 void fill(typeBoard * board){ //prueba para el switch
  int i,j;

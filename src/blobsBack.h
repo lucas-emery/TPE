@@ -2,7 +2,7 @@
 #define FALSE 0
 #define AIPLAYER 2
 
-typedef enum {MENU, GAME, SAVE, LOAD, END, QUIT} gameState;
+typedef enum {MENU, NEWGAME, GAME, SAVE, LOAD, END, QUIT} gameState;
 
 typedef struct {
   int x;
