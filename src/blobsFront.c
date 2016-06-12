@@ -23,7 +23,7 @@
 
 int main(int argc, char **argv) {
 
-	int blobCount[3] = {0,2,2};
+	int blobCount[3];
 	typeBoard board;
 	board.get = NULL;
 
@@ -74,10 +74,15 @@ int main(int argc, char **argv) {
 
 			case NEWGAME:
 				player = rand()%2 + 1;
+				blobCount[1] = 2;
+				blobCount[2] = 2;
 				if(init(&board, NULL))
 					state = GAME;
-				else
-					state = QUIT;
+				else {
+					printf("\nPresione enter para volver al menu\n");
+					while(getchar() != '\n');
+					state = MENU;
+				}
 				break;
 
 			case GAME:
@@ -126,18 +131,15 @@ int main(int argc, char **argv) {
 					state = MENU;
 				else
 					state = GAME;
-				free(filename);
+				free(filename - 1);
 				break;
 
 			case LOAD:
 				CLEAR_SCREEN;
 				filename = getFilename();
 				char *loadedArray = NULL;
-				if(load(filename, &vsAI, &player, blobCount, &board, &loadedArray)) {
-					if(init(&board, loadedArray)) {
-						state = GAME;
-					}
-				}
+				if(load(filename, &vsAI, &player, blobCount, &board, &loadedArray) && init(&board, loadedArray))
+					state = GAME;
 				else {
 					printf("\nPresione enter para volver al menu\n");
 					while(getchar() != '\n');

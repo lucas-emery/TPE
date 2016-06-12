@@ -32,7 +32,6 @@ int canMove(int player, typeBoard *board);
 void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]);
 int endGame(typeBoard *board, int blobCount[]);
 void fill(typeBoard *board);
-void fillEatAndMove(typeBoard *board);
 void getAImove(typeCommand *command, typeBoard *board);
 char* getCommand(typeCommand *command);
 char* getFilename();

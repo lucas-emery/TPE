@@ -6,12 +6,12 @@
 typedef enum {CMD_START, CMD_MOVE, CMD_SAVE, CMD_QUIT, CMD_RESET} getCmdState;
 typedef enum {EAT, MOVE} mapType;
 
-int init(typeBoard *board, char *loadedArray){
+int init(typeBoard *board, char *loadedArray) {
 
   typeBlob *temp;
   int i,j,k,l,minX,minY,maxX,maxY;
 
-  if(loadedArray == NULL){
+  if(loadedArray == NULL) {
     do {
       board->h = getint("\nIngrese la cantidad de filas(Entre 5 y 30): ");
     } while(board->h < 5 || board->h > 30);
@@ -22,14 +22,14 @@ int init(typeBoard *board, char *loadedArray){
 
   if((board->get = (typeBlob**) malloc(board->h * sizeof(typeBlob*))) == NULL){
     printf("No hay suficiente espacio en el Heap\n");
-    return 0;
+    return FALSE;
   }
 
   if((temp = (typeBlob*) malloc(board->h * board->w * sizeof(typeBlob))) == NULL)
   {
     printf("No hay suficiente espacio en el Heap\n");
     free(board->get);
-    return 0;
+    return FALSE;
   }
 
   for (i = 0; i < board->h; i++) {
@@ -37,12 +37,12 @@ int init(typeBoard *board, char *loadedArray){
   }
 
 
-  if(loadedArray == NULL){
+  if(loadedArray == NULL) {
     fill(board);
   }
-  else{
-    for(i = 0 ; i < board->h ; i++){
-      for(j = 0 ; j < board->w ; j++){
+  else {
+    for(i = 0 ; i < board->h ; i++) {
+      for(j = 0 ; j < board->w ; j++) {
         switch(loadedArray[(i*board->w)+j]) {
           case '0':
             board->get[i][j].owner = 0;
@@ -57,8 +57,9 @@ int init(typeBoard *board, char *loadedArray){
             break;
 
           default:
-            //LOADED WRONG CHARS
-            //EXIT
+            printf("El archivo cargado esta corrupto, no se puede generar el tablero\n");
+            free(loadedArray);
+            return FALSE;
             break;
         }
       }
@@ -109,7 +110,7 @@ int init(typeBoard *board, char *loadedArray){
     }
 
   }
-  return 1;
+  return TRUE;
 }
 
 void fill(typeBoard * board){ //prueba para el switch
@@ -124,30 +125,6 @@ void fill(typeBoard * board){ //prueba para el switch
     }
     else
       board->get[i][j].owner = 0;
-    }
-  }
-}
-
-void fillEatAndMove(typeBoard *board) {
-  int moveMap[6][6] = {{8,10,13,13,10,8},
-                       {10,14,18,18,14,10},
-                       {13,18,23,23,18,13},
-                       {13,18,23,23,18,13},
-                       {10,14,18,18,14,10},
-                       {8,10,13,13,10,8}};
-
-  int eatMap[6][6] = {{0,1,0,0,0,0},
-                      {1,1,0,0,0,0},
-                      {0,0,0,0,0,0},
-                      {0,0,0,0,0,0},
-                      {1,1,0,0,0,0},
-                      {0,1,0,0,0,0}};
-
-  int i, j;
-  for (i = 0; i < board->h; i++) {
-    for (j = 0; j < board->w; j++) {
-      board->get[i][j].canMove = moveMap[i][j];
-      board->get[i][j].canEat = eatMap[i][j];
     }
   }
 }
@@ -176,10 +153,6 @@ char* getCommand(typeCommand *command) {
     state = CMD_START;
     i = 0;
     length = 0;
-    command->source.x = -1;
-    command->source.y = -1;
-    command->target.x = -1;
-    command->target.y = -1;
 
     printf("\nIngrese un comando: ");
 
@@ -571,21 +544,21 @@ char* getFilename() {
 }
 
 int save(char *filename, int vsAI, int player, int blobCount[], typeBoard *board){
-  int i, j, result = FALSE, error;
+  int i, j, result = FALSE;
 	FILE *file;
   char *boardBuffer;
   int dataBuffer[6] = {vsAI, player, board->h, board->w, blobCount[1], blobCount[2]};
 
   if((boardBuffer = (char*) malloc(board->w * board->h * sizeof(char))) == NULL) {
-    printf("No hay suficiente espacio en el heap para realizar esta operación");
+    printf("No hay suficiente espacio en el heap para realizar esta operación\n");
   }
   else {
     if ((file = fopen(filename,"wb")) == NULL) {
   		perror("Error al intentar crear el archivo");
   	}
     else {
-  	  if((error = fwrite(dataBuffer, sizeof(int), 6, file)) < 6) {
-        printf("Error al intentar guardar los datos");
+  	  if(fwrite(dataBuffer, sizeof(int), 6, file) < 6) {
+        printf("Error al intentar guardar los datos\n");
       }
       else {
         for(i = 0; i < board->h; i++) {
@@ -604,14 +577,14 @@ int save(char *filename, int vsAI, int player, int blobCount[], typeBoard *board
           }
         }
         if(fwrite(boardBuffer, sizeof(char), board->w * board->h, file) < (board->w * board->h)) {
-          printf("Error al intentar guardar el tablero");
+          printf("Error al intentar guardar el tablero\n");
         }
         else {
           result = TRUE;
         }
       }
       if(fclose(file) == EOF)
-  			perror("Error al intentar cerrar el archivo");
+  			printf("Error al intentar cerrar el archivo\n");
     }
     free(boardBuffer);
   }
@@ -627,25 +600,25 @@ int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *boa
 	}
 	else {
 		if(fread(vsAI, sizeof(int), 1, file) == 0)
-			printf("Error al intentar cargar el modo de juego");
+			printf("Error al intentar cargar el modo de juego\n");
 		else {
 			if(fread(player, sizeof(int), 1, file) == 0)
-				printf("Error al intentar cargar el turno");
+				printf("Error al intentar cargar el turno\n");
 			else {
 				if(fread(&board->h, sizeof(int), 1, file) == 0)
-					printf("Error al intentar cargar el alto del tablero");
+					printf("Error al intentar cargar el alto del tablero\n");
 				else {
 					if(fread(&board->w, sizeof(int), 1, file) == 0)
-						printf("Error al intentar cargar el ancho del tablero");
+						printf("Error al intentar cargar el ancho del tablero\n");
 					else {
 						if(fread(&blobCount[1], sizeof(int), 2, file) < 2)
-							printf("Error al intentar cargar los puntajes");
+							printf("Error al intentar cargar los puntajes\n");
 						else {
 							if((*loadedArray = (char*) malloc(board->h * board->w * sizeof(char))) == NULL)
 						    printf("No hay suficiente espacio en el Heap para cargar el tablero\n");
 							else {
 									if(fread(*loadedArray, sizeof(char), board->h * board->w, file) < (board->h*board->w))
-										printf("Error al intentar cargar el tablero");
+										printf("Error al intentar cargar el tablero\n");
 									else
 										result = TRUE;
 							}
@@ -655,7 +628,7 @@ int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *boa
 			}
 		}
 		if(fclose(file) == EOF)
-			perror("Error al intentar cerrar el archivo");
+			printf("Error al intentar cerrar el archivo\n");
 	}
   free(filename);
 	return result;
