@@ -47,7 +47,7 @@ int init(typeBoard *board, char *loadedArray){
   else{
     for(i = 0 ; i < board->h ; i++){
       for(j = 0 ; j < board->w ; j++){
-        switch(loadedArray[i*j]){
+        switch(loadedArray[(i*board->w)+j]) {
           case '0':
             board->get[i][j].owner = 0;
             break;
@@ -599,13 +599,13 @@ int save(char *filename, int vsAI, int player, int blobCount[], typeBoard *board
           for(j = 0; j < board->w; j++) {
             switch(board->get[i][j].owner) {
               case 0:
-                boardBuffer[i*j] = '0';
+                boardBuffer[(i*board->w)+j] = '0';
                 break;
               case 1:
-                boardBuffer[i*j] = 'A';
+                boardBuffer[(i*board->w)+j] = 'A';
                 break;
               case 2:
-                boardBuffer[i*j] = 'Z';
+                boardBuffer[(i*board->w)+j] = 'Z';
                 break;
             }
           }
@@ -625,7 +625,7 @@ int save(char *filename, int vsAI, int player, int blobCount[], typeBoard *board
 	return result;
 }
 
-int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *board, char *loadedArray) {
+int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *board, char **loadedArray) {
 	int result = FALSE;
 	FILE *file;
 
@@ -648,10 +648,10 @@ int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *boa
 						if(fread(&blobCount[1], sizeof(int), 2, file) < 2)
 							printf("Error al intentar cargar los puntajes");
 						else {
-							if((loadedArray = (char*) malloc(board->h * board->w * sizeof(char))) == NULL)
+							if((*loadedArray = (char*) malloc(board->h * board->w * sizeof(char))) == NULL)
 						    printf("No hay suficiente espacio en el Heap para cargar el tablero\n");
 							else {
-									if(fread(loadedArray, sizeof(char), board->h * board->w, file) < (board->h*board->w))
+									if(fread(*loadedArray, sizeof(char), board->h * board->w, file) < (board->h*board->w))
 										printf("Error al intentar cargar el tablero");
 									else
 										result = TRUE;

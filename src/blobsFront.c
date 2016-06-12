@@ -135,15 +135,16 @@ int main(int argc, char **argv) {
 			case LOAD:
 				CLEAR_SCREEN;
 				filename = getFilename();
-				if(load(filename, &vsAI, &player, blobCount, &board, loadedArray)) {
+				if(load(filename, &vsAI, &player, blobCount, &board, &loadedArray)) {
 					if(init(&board, loadedArray)) {
 						state = GAME;
 					}
 				}
-				else
+				else {
 					printf("\nPresione enter para volver al menu\n");
 					while(getchar() != '\n');
 					state = MENU;
+				}
 				break;
 
 			case END:
@@ -219,7 +220,7 @@ void renderMaps(typeBoard *board) {
 	int i, j;
 	for (i = 0; i < board->h; i++) {
     for (j = 0; j < board->w; j++) {
-			printf("|%d",board->get[i][j].canMove);
+			printf("|%02d",board->get[i][j].canMove);
 		}
 		printf("|\n");
 	}
