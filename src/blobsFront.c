@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 	int blobCount[3] = {0,2,2};
 	typeBoard board;
 	board.get = NULL;
-	char** loadedArray = NULL;
+	char *loadedArray = NULL;
 
 	gameState state = MENU;
 	typeCommand command;
@@ -121,13 +121,15 @@ int main(int argc, char **argv) {
 				break;
 
 			case SAVE:
-				save(filename, vsAI, player, &board);
-				printf("\n¡Juego guardado exitosamente en %s!", filename); //SPACEHOLDER
+				if(save(filename, vsAI, player, blobCount, &board))
+					printf("\n¡Juego guardado exitosamente en %s!\n", filename);
+				printf("\nPresione enter para continuar\n");
 				while(getchar() != '\n');
 				if(filename[-1] == 'T')
 					state = MENU;
 				else
 					state = GAME;
+				free(filename);
 				break;
 
 			case LOAD:
@@ -135,11 +137,8 @@ int main(int argc, char **argv) {
 				filename = getFilename();
 				if(load(filename, &vsAI, &player, blobCount, &board, loadedArray)) {
 					if(init(&board, loadedArray)) {
-						printf("Successfully loaded\n"); //For debugging
-						getchar();
 						state = GAME;
 					}
-					state = QUIT;
 				}
 				else
 					printf("\nPresione enter para volver al menu\n");
@@ -214,32 +213,6 @@ void render(typeBoard* board, const int blobCount[],int player){
   	printf("Turno: "PLAYER2"\n\n");
   }
 
-}
-
-int save(char *filename, int mode, int player, typeBoard *board){
-
-	errno = 0;
-
-	FILE *ptr;
-
-    typeSave rec = {mode, player, board -> h, board -> w}; /* Falta recorrer los 2 blobs y guardarlas fichas que tiene cada uno y por último las A y Z, el load es al revés, ya lo aprendé :) */
-
-	ptr = fopen(filename,"wb");
-
-	free(filename);
-
-	if (ptr == NULL)
-	{
-		printf("Error al abrir el archivo.\n");
-		printf("Error %d \n", errno);
-		return 1;
-	}
-
-	fwrite(&rec, sizeof(typeSave), 1, ptr);
-
-	fclose(ptr);
-
-	return 0;
 }
 
 void renderMaps(typeBoard *board) {

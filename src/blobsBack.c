@@ -11,12 +11,12 @@
 typedef enum {CMD_START, CMD_MOVE, CMD_SAVE, CMD_QUIT, CMD_RESET} getCmdState;
 typedef enum {EAT, MOVE} mapType;
 
-int init(typeBoard *board, char **loadedArray){
+int init(typeBoard *board, char *loadedArray){
 
   typeBlob *temp;
   int i,j,k,l,minX,minY,maxX,maxY;
 
-  if(loadedArray==NULL){
+  if(loadedArray == NULL){
 
     printf("La matriz:\n");
     board->h = getint("Ingrese altura:\n");
@@ -47,7 +47,7 @@ int init(typeBoard *board, char **loadedArray){
   else{
     for(i = 0 ; i < board->h ; i++){
       for(j = 0 ; j < board->w ; j++){
-        switch(loadedArray[i][j]){
+        switch(loadedArray[i*j]){
           case '0':
             board->get[i][j].owner = 0;
             break;
@@ -59,11 +59,14 @@ int init(typeBoard *board, char **loadedArray){
           case 'Z':
             board->get[i][j].owner = 2;
             break;
+
+          default:
+            //LOADED WRONG CHARS
+            //EXIT
+            break;
         }
       }
     }
-
-    free(*loadedArray);
     free(loadedArray);
   }
 
@@ -571,55 +574,87 @@ char* getFilename() {
   return filename;
 }
 
-int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *board, char **loadedArray) {
-	char *temp;
-	int i;
+int save(char *filename, int vsAI, int player, int blobCount[], typeBoard *board){
+  int i, j, result = FALSE, error;
+	FILE *file;
+  char *boardBuffer;
+  int dataBuffer[6] = {vsAI, player, board->h, board->w, blobCount[1], blobCount[2]};
 
+  for(i = 0; i < 6; i++)
+    printf("%d,", dataBuffer[i]);
+
+  if((boardBuffer = (char*) malloc(board->w * board->h * sizeof(char))) == NULL) {
+    printf("No hay suficiente espacio en el heap para realizar esta operación");
+  }
+  else {
+    if ((file = fopen(filename,"wb")) == NULL) {
+  		perror("Error al intentar crear el archivo");
+  	}
+    else {
+  	  if((error = fwrite(dataBuffer, sizeof(int), 6, file)) < 6) {
+        printf("Error al intentar guardar los datos");
+      }
+      else {
+        for(i = 0; i < board->h; i++) {
+          for(j = 0; j < board->w; j++) {
+            switch(board->get[i][j].owner) {
+              case 0:
+                boardBuffer[i*j] = '0';
+                break;
+              case 1:
+                boardBuffer[i*j] = 'A';
+                break;
+              case 2:
+                boardBuffer[i*j] = 'Z';
+                break;
+            }
+          }
+        }
+        if(fwrite(boardBuffer, sizeof(char), board->w * board->h, file) < (board->w * board->h)) {
+          printf("Error al intentar guardar el tablero");
+        }
+        else {
+          result = TRUE;
+        }
+      }
+      if(fclose(file) == EOF)
+  			perror("Error al intentar cerrar el archivo");
+    }
+    free(boardBuffer);
+  }
+	return result;
+}
+
+int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *board, char *loadedArray) {
+	int result = FALSE;
 	FILE *file;
 
 	if((file = fopen(filename, "rb")) == NULL) {
 		perror("Error al intentar abrir el archivo");
-		free(filename);
 	}
 	else {
-		free(filename);
-		if(fread(vsAI, sizeof(int), 1, file) < sizeof(int))
-			printf("Error en el formato del archivo");
+		if(fread(vsAI, sizeof(int), 1, file) == 0)
+			printf("Error al intentar cargar el modo de juego");
 		else {
-			if(fread(player, sizeof(int), 1, file) < sizeof(int))
-				printf("Error en el formato del archivo");
+			if(fread(player, sizeof(int), 1, file) == 0)
+				printf("Error al intentar cargar el turno");
 			else {
-				if(fread(&board->h, sizeof(int), 1, file) < sizeof(int))
-					printf("Error en el formato del archivo");
+				if(fread(&board->h, sizeof(int), 1, file) == 0)
+					printf("Error al intentar cargar el alto del tablero");
 				else {
-					if(fread(&board->w, sizeof(int), 1, file) < sizeof(int))
-						printf("Error en el formato del archivo");
+					if(fread(&board->w, sizeof(int), 1, file) == 0)
+						printf("Error al intentar cargar el ancho del tablero");
 					else {
-						if(fread(&blobCount[1], sizeof(int), 2, file) < (sizeof(int)*2))
-							printf("Error en el formato del archivo");
+						if(fread(&blobCount[1], sizeof(int), 2, file) < 2)
+							printf("Error al intentar cargar los puntajes");
 						else {
-							if((loadedArray = (char**) malloc(board->h * sizeof(char*))) == NULL)
-						    printf("No hay suficiente espacio en el Heap\n");
+							if((loadedArray = (char*) malloc(board->h * board->w * sizeof(char))) == NULL)
+						    printf("No hay suficiente espacio en el Heap para cargar el tablero\n");
 							else {
-							  if((temp = (char*) malloc(board->h * board->w * sizeof(char))) == NULL)
-							  {
-							    printf("No hay suficiente espacio en el Heap\n");
-							    free(loadedArray);
-							  }
-								else {
-								  for (i = 0; i < board->h; i++) {
-								    loadedArray[i] = temp + (i * board->w);
-								  }
-
-									if(fread(*loadedArray, sizeof(char), (board->h*board->w), file) < (sizeof(char)*board->h*board->w))
-										printf("Error en el formato del archivo");
-									else {
-										if(fclose(file) == EOF)
-											printf("Error al intentar cerrar el archivo");
-										else
-											return 1;
-									}
-								}
+									if(fread(loadedArray, sizeof(char), board->h * board->w, file) < (board->h*board->w))
+										printf("Error al intentar cargar el tablero");
+									else
+										result = TRUE;
 							}
 						}
 					}
@@ -629,5 +664,6 @@ int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *boa
 		if(fclose(file) == EOF)
 			perror("Error al intentar cerrar el archivo");
 	}
-	return 0;
+  free(filename);
+	return result;
 }

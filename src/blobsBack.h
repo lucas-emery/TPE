@@ -20,23 +20,11 @@ typedef struct {
   int canEat;
 } typeBlob;
 
-typedef struct{
+typedef struct {
   int h;
   int w;
   typeBlob **get;
 } typeBoard;
-
-typedef struct
-	{
-		int mode;
-		int nextTurn;
-		int h;
-		int w;
-		int blobsPlayer1;
-		int blobsPlayer2;
-		char blobs[1000];
-
-} typeSave;
 
 int canMove(int player, typeBoard *board);
 char* getCommand(typeCommand *command);
@@ -45,12 +33,12 @@ int validCommand(int player, typeCommand *command, typeBoard *board);
 int move(int player, typeCommand *command, typeBoard *board);
 void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]);
 void render(typeBoard *board, const int *blobCount,int player);
-int init(typeBoard *board, char **loadedArray);
+int init(typeBoard *board, char *loadedArray);
 void fill(typeBoard *board);
 void fillEatAndMove(typeBoard *board);
 void renderMaps(typeBoard *board);
 void getAImove(typeCommand *command, typeBoard *board);
 int endGame(typeBoard *board, int blobCount[]);
-int save(char *filename, int mode, int player, typeBoard *board);
-int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *board, char **loadedArray);
+int save(char *filename, int vsAI, int player, int blobCount[], typeBoard *board);
+int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *board, char *loadedArray);
 char* getFilename();
