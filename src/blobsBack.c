@@ -580,9 +580,6 @@ int save(char *filename, int vsAI, int player, int blobCount[], typeBoard *board
   char *boardBuffer;
   int dataBuffer[6] = {vsAI, player, board->h, board->w, blobCount[1], blobCount[2]};
 
-  for(i = 0; i < 6; i++)
-    printf("%d,", dataBuffer[i]);
-
   if((boardBuffer = (char*) malloc(board->w * board->h * sizeof(char))) == NULL) {
     printf("No hay suficiente espacio en el heap para realizar esta operación");
   }
