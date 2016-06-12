@@ -660,18 +660,19 @@ int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *boa
 	return result;
 }
 
-int getint() {
+int getint(char *message) {
   char input, output = 0, valid = FALSE;
   while(!valid) {
+    printf(message);
     while((input = getchar()) != '\n') {
       if(input >= '0' && input <= '9') {
           output = (10*output) + (input - '0');
           valid = TRUE;
       }
       else {
-        printf("Ingrese un numero: ");
         valid = FALSE;
         while(getchar() != '\n'); //EMPTY BUFFER
+        break;
       }
     }
   }

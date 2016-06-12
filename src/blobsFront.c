@@ -53,8 +53,7 @@ int main(int argc, char **argv) {
         				"\t3. Recuperar un juego guardado\n"
            				"\t4. Terminar\n");
 				do {
-					printf("\nElegir opción: ");
-					input = getint();
+					input = getint("\nElegir opción: ");
 
 					if(input == 1)
 						state = NEWGAME;

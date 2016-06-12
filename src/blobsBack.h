@@ -44,4 +44,4 @@ int endGame(typeBoard *board, int blobCount[]);
 int save(char *filename, int vsAI, int player, int blobCount[], typeBoard *board);
 int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *board, char **loadedArray);
 char* getFilename();
-int getint();
+int getint(char *message);
