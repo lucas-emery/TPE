@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include <errno.h>
-#include "getnum.h"
 #include "blobsBack.h"
 #ifdef _WIN32
 	#define BLOB1 "A"
@@ -28,14 +26,13 @@ int main(int argc, char **argv) {
 	int blobCount[3] = {0,2,2};
 	typeBoard board;
 	board.get = NULL;
-	char *loadedArray = NULL;
 
 	gameState state = MENU;
 	typeCommand command;
 	int vsAI, input, winner; //winner quedo aca porque no puede estar al principio de un case
 	char *filename, *retValue;
 	srand(time(NULL));
-	int player = rand()%2 + 1; /* Generate a number between 1 & 2 (0 is not included) */
+	int player;
 
 	while(state != QUIT) {
 		switch(state) {
@@ -46,7 +43,7 @@ int main(int argc, char **argv) {
 					free(board.get);
 					board.get = NULL;
 				}
-				vsAI=FALSE;
+				vsAI = FALSE;
 				input = 0;
 
 				CLEAR_SCREEN;
@@ -56,7 +53,8 @@ int main(int argc, char **argv) {
         				"\t3. Recuperar un juego guardado\n"
            				"\t4. Terminar\n");
 				do {
-					input = getint("\nElegir opción: ");
+					printf("\nElegir opción: ");
+					input = getint();
 
 					if(input == 1)
 						state = NEWGAME;
@@ -76,6 +74,7 @@ int main(int argc, char **argv) {
 				break;
 
 			case NEWGAME:
+				player = rand()%2 + 1;
 				if(init(&board, NULL))
 					state = GAME;
 				else
@@ -135,6 +134,7 @@ int main(int argc, char **argv) {
 			case LOAD:
 				CLEAR_SCREEN;
 				filename = getFilename();
+				char *loadedArray = NULL;
 				if(load(filename, &vsAI, &player, blobCount, &board, &loadedArray)) {
 					if(init(&board, loadedArray)) {
 						state = GAME;

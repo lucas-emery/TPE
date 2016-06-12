@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include "getnum.h"
 #include "blobsBack.h"
 
 typedef enum {CMD_START, CMD_MOVE, CMD_SAVE, CMD_QUIT, CMD_RESET} getCmdState;
@@ -659,4 +658,22 @@ int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *boa
 	}
   free(filename);
 	return result;
+}
+
+int getint() {
+  char input, output = 0, valid = FALSE;
+  while(!valid) {
+    while((input = getchar()) != '\n') {
+      if(input >= '0' && input <= '9') {
+          output = (10*output) + (input - '0');
+          valid = TRUE;
+      }
+      else {
+        printf("Ingrese un numero: ");
+        valid = FALSE;
+        while(getchar() != '\n'); //EMPTY BUFFER
+      }
+    }
+  }
+  return output;
 }
