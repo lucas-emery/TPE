@@ -87,7 +87,6 @@ int main(int argc, char **argv) {
 				if(canMove(player, &board)) {
 					if(vsAI && player == AIPLAYER) {
 						getAImove(&command, &board);
-						printf("gotAImove\n");
 					}
 					else {
 						printf("Para moverse:        [f1,c1][f2,c2]\n"

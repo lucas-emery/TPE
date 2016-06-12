@@ -12,11 +12,12 @@ int init(typeBoard *board, char *loadedArray){
   int i,j,k,l,minX,minY,maxX,maxY;
 
   if(loadedArray == NULL){
-
-    board->h = getint("Ingrese la cantidad de filas(Entre 5 y 30):\n");
-    // IF INVALID -> PRINTF ERROR, GETINT DEVUELTA
-    board->w = getint("Ingrese la cantidad de columnas(Entre 5 y 30)\n");
-    // IF INVALID -> PRINTF ERROR, GETINT DEVUELTA
+    do {
+      board->h = getint("\nIngrese la cantidad de filas(Entre 5 y 30): ");
+    } while(board->h < 5 || board->h > 30);
+    do {
+      board->w = getint("\nIngrese la cantidad de columnas(Entre 5 y 30): ");
+    } while(board->w < 5 || board->w > 30);
   }
 
   if((board->get = (typeBlob**) malloc(board->h * sizeof(typeBlob*))) == NULL){
@@ -661,8 +662,9 @@ int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *boa
 }
 
 int getint(char *message) {
-  char input, output = 0, valid = FALSE;
+  char input, output, valid = FALSE;
   while(!valid) {
+    output = 0;
     printf(message);
     while((input = getchar()) != '\n') {
       if(input >= '0' && input <= '9') {
