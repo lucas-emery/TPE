@@ -1,3 +1,5 @@
+#define INCREMENT 1
+#define DECREMENT -1
 #define TRUE 1
 #define FALSE 0
 #define AIPLAYER 2

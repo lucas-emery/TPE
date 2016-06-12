@@ -1,12 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
-#include <math.h>
 #include "getnum.h"
 #include "blobsBack.h"
-
-#define INCREMENT 1
-#define DECREMENT -1
 
 typedef enum {CMD_START, CMD_MOVE, CMD_SAVE, CMD_QUIT, CMD_RESET} getCmdState;
 typedef enum {EAT, MOVE} mapType;
@@ -18,10 +14,10 @@ int init(typeBoard *board, char *loadedArray){
 
   if(loadedArray == NULL){
 
-    printf("La matriz:\n");
-    board->h = getint("Ingrese altura:\n");
-    board->w = getint("Ingrese ancho:\n");
-
+    board->h = getint("Ingrese la cantidad de filas(Entre 5 y 30):\n");
+    // IF INVALID -> PRINTF ERROR, GETINT DEVUELTA
+    board->w = getint("Ingrese la cantidad de columnas(Entre 5 y 30)\n");
+    // IF INVALID -> PRINTF ERROR, GETINT DEVUELTA
   }
 
   if((board->get = (typeBlob**) malloc(board->h * sizeof(typeBlob*))) == NULL){
