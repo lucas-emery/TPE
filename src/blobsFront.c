@@ -21,7 +21,7 @@
 	#define CLEAR_SCREEN system("clear")
 #endif
 
-int main(int argc, char **argv) {
+int main() {
 
 	int blobCount[3];
 	typeBoard board;
@@ -87,8 +87,6 @@ int main(int argc, char **argv) {
 
 			case GAME:
 				render(&board, blobCount, player);
-				if(argc > 1 && argv[1][0] == 'd')
-					renderMaps(&board);
 				if(canMove(player, &board)) {
 					if(vsAI && player == AIPLAYER) {
 						getAImove(&command, &board);
@@ -214,20 +212,4 @@ void render(typeBoard* board, const int blobCount[],int player){
   	printf("Turno: "PLAYER2"\n\n");
   }
 
-}
-
-void renderMaps(typeBoard *board) {
-	int i, j;
-	for (i = 0; i < board->h; i++) {
-    for (j = 0; j < board->w; j++) {
-			printf("|%02d",board->get[i][j].canMove);
-		}
-		printf("|\n");
-	}
-	for (i = 0; i < board->h; i++) {
-    for (j = 0; j < board->w; j++) {
-			printf("|%d",board->get[i][j].canEat);
-		}
-		printf("|\n");
-	}
 }

@@ -41,6 +41,5 @@ int isInside(int x, int y, int w, int h); //Just for the record
 int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *board, char **loadedArray);
 int move(int player, typeCommand *command, typeBoard *board);
 void render(typeBoard *board, const int *blobCount,int player);
-void renderMaps(typeBoard *board);
 int save(char *filename, int vsAI, int player, int blobCount[], typeBoard *board);
 int validCommand(int player, typeCommand *command, typeBoard *board);

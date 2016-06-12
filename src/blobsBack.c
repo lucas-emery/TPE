@@ -87,7 +87,6 @@ int init(typeBoard *board, char *loadedArray) {
 
         if( maxX > board->w-1 )
           maxX = board->w-1;
-        /*printf("=i:%d=j:%d=mY:%d=MY:%d=mX:%d=MX:%d=\n",i,j,minY,maxY,minX,maxX);*/
         board->get[i][j].canMove = 0;
         board->get[i][j].canEat = 0;
 
@@ -296,10 +295,10 @@ char* getCommand(typeCommand *command) {
     }
   }
 
-  command->source.x--; //Human to computer correction
-  command->source.y--;
-  command->target.x--;
-  command->target.y--;
+  command->source.x; //Human to computer correction
+  command->source.y;
+  command->target.x;
+  command->target.y;
 
   if(output != NULL && *output != EOF)
     output[length] = '\0';
