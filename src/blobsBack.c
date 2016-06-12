@@ -295,11 +295,6 @@ char* getCommand(typeCommand *command) {
     }
   }
 
-  command->source.x; //Human to computer correction
-  command->source.y;
-  command->target.x;
-  command->target.y;
-
   if(output != NULL && *output != EOF)
     output[length] = '\0';
 

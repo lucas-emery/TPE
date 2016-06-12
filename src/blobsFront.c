@@ -29,10 +29,9 @@ int main() {
 
 	gameState state = MENU;
 	typeCommand command;
-	int vsAI, input, winner; //winner quedo aca porque no puede estar al principio de un case
+	int vsAI, input, player, winner;
 	char *filename, *retValue;
 	srand(time(NULL));
-	int player;
 
 	while(state != QUIT) {
 		switch(state) {
