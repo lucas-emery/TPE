@@ -36,7 +36,7 @@
   int endGame(typeBoard *board, int blobCount[]);
   void fill(typeBoard *board);
   void getAImove(typeCommand *command, typeBoard *board);
-  char* getCommand(typeCommand *command);
+  int getCommand(typeCommand *command, char **output);
   char* getFilename();
   int getint(char *message);
   int init(typeBoard *board, char *loadedArray);

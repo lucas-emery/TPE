@@ -95,14 +95,21 @@ int main() {
 									 "Para guardar:        save nombreDelArchivo\n"
 									 "Para volver al menu: quit\n");
 						do {
-							retValue = getCommand(&command);
-							if(retValue != NULL) {
-								if(*retValue == EOF) //PLAYER QUIT
-									state = MENU;
-								else {
-									state = SAVE;
-									filename = retValue;
+							if(getCommand(&command, &retValue)) {
+								if(retValue != NULL) {
+									if(*retValue == EOF) //PLAYER QUIT
+										state = MENU;
+									else {
+										state = SAVE;
+										filename = retValue;
+									}
 								}
+							}
+							else {
+								printf("\nPresione enter para volver al menu\n");
+								while(getchar() != '\n');
+								state = MENU;
+								break;
 							}
 						} while(state == GAME && !validCommand(player, &command, &board));
 					}
