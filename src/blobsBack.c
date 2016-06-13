@@ -128,7 +128,7 @@ void fill(typeBoard * board){ //prueba para el switch
   }
 }
 
-int canMove(int player, typeBoard *board) {
+int canMove(int player, typeBoard *board) { //Busca si alguno de los blobs del jugador se puede mover
   int i, j;
   for(i = 0; i < board->h; i++) {
     for(j = 0; j < board->w; j++) {
@@ -140,13 +140,13 @@ int canMove(int player, typeBoard *board) {
   return FALSE;
 }
 
-int getCommand(typeCommand *command, char **output) {
-  char input;
-  const char *pattern;
-  getCmdState state;
-  int valid = FALSE, i, length;
-
-  while(!valid) {
+int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no hubo ningun error de memoria
+  char input;                                         //Si el jugador introdujo un movimiento, lo retorna por command
+  const char *pattern;                                //Si decidio guardar devuelve el nombre del archivo por output
+  getCmdState state;                                  //y un caracter 'F' escondido antes del nombre del archivo que
+  int valid = FALSE, i, length;                       //indica que debe continuar la partida
+                                                      //Si decidio guardar y salir devuelve el nombre del archivo por
+  while(!valid) {                                     //output y 'T' escondido antes del nombre del archivo
     *output = NULL;
     state = CMD_START;
     i = 0;
@@ -159,33 +159,33 @@ int getCommand(typeCommand *command, char **output) {
         case CMD_START:
           if(input == '[') {
             state = CMD_MOVE;
-            pattern = "[#*,#*][#*,#*]";
+            pattern = "[#*,#*][#*,#*]";		//En este patron, # es un numero obligatorio y * un nro opcional
           }
           else if(input == 's') {
             state = CMD_SAVE;
-            pattern = "save F";
+            pattern = "save F";				//En este patron, F indica que lo que sigue es el filename(nombre del archivo)
           }
           else if(input == 'q') {
             state = CMD_QUIT;
             pattern = "quit";
           }
           else
-            state = CMD_RESET; //invalid command
+            state = CMD_RESET;		//Indica que el comando ingresado es invalido
           i++;
           break;
 
         case CMD_MOVE:
-          if(pattern[i] == '*') {
+          if(pattern[i] == '*') {	//Significa que este caracter puede ser un nro o debe ser evaluado contra el patron
             i++;
             if(input >= '0' && input <= '9') {
               if(i == 3) command->source.y = command->source.y*10 + (input-'0');
               else if(i == 6) command->source.x = command->source.x*10 + (input-'0');
               else if(i == 10) command->target.y = command->target.y*10 + (input-'0');
               else if(i == 13) command->target.x = command->target.x*10 + (input-'0');
-              break;
+              break;	//Pasa al siguiente caracter porque lo que se ingreso es un nro de dos digitos
             }
           }
-          if(pattern[i] == '#') {
+          if(pattern[i] == '#') { //Significa que este caracter tiene que ser un nro
             if(input >= '0' && input <= '9') {
               if(i == 1) command->source.y = input-'0';
               else if(i == 4) command->source.x = input-'0';
@@ -196,9 +196,9 @@ int getCommand(typeCommand *command, char **output) {
             else
               state = CMD_RESET;
           }
-          else if(input == pattern[i]) {
+          else if(input == pattern[i]) { //Si el comando es mas largo que el patron, chequea contra NULL y por ende es invalido
             i++;
-            if(pattern[i] == '\0')
+            if(pattern[i] == '\0') //Si se llegó al final del patron, el comando es valido
               valid = TRUE;
           }
           else {
@@ -209,13 +209,13 @@ int getCommand(typeCommand *command, char **output) {
 
         case CMD_SAVE:
           if(pattern[i] == 'F') {
-            if(length < 100) {
+            if(length < 100) { //Largo máximo arbitrario
               if(*output == NULL) {
-                if((*output = (char*) malloc(102*sizeof(char))) == NULL) {//Extra space for \0 && not quit command
-					printf("No hay suficiente espacio en el Heap\n");
+                if((*output = (char*) malloc(102*sizeof(char))) == NULL) { //2 espacios extra, uno para el final del string y
+					printf("No hay suficiente espacio en el Heap\n");      //otro para el caracter escondido
 					return FALSE;
 				}
-                *output[0] = 'F'; //False
+                **output = 'F'; //Flag para NO salir despues de guardar
                 *output++;
               }
               *output[length] = input;
@@ -237,12 +237,12 @@ int getCommand(typeCommand *command, char **output) {
         case CMD_QUIT:
           if(input == pattern[i]) {
             i++;
-            if(pattern[i] == '\0') {
+            if(pattern[i] == '\0') { //Cuando llego al final del patron, el comando es valido
               if((*output = (char*) malloc(sizeof(char))) == NULL) {
 					printf("No hay suficiente espacio en el Heap\n");
 					return FALSE;
 				}
-              **output = EOF;
+              **output = EOF;		//EOF se utiliza para señalizar que el usuario quiere salir
               valid = TRUE;
             }
           }
@@ -253,7 +253,8 @@ int getCommand(typeCommand *command, char **output) {
           break;
 
         case CMD_RESET:
-          //EMPTIES BUFFER
+          //Vacia el buffer
+		  
           break;
       }
     }
@@ -279,7 +280,7 @@ int getCommand(typeCommand *command, char **output) {
 		  }
 		  else
 			*output = aux;
-          *output[0] = 'T'; //True
+          **output = 'T'; //True
           *output++;
           while(!valid) {
             printf("Ingrese un nombre para el archivo (máximo 100 caracteres): ");
