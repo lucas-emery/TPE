@@ -37,12 +37,12 @@ int main() {
 		switch(state) {
 			case MENU:
 
-				if(board.get != NULL) {
+				if(board.get != NULL) {    // Cada vez que entra a MENU, limpia el tablero.
 					free(*board.get);
 					free(board.get);
 					board.get = NULL;
 				}
-				vsAI = FALSE;
+				vsAI = FALSE;              // Y las variables
 				input = 0;
 
 				CLEAR_SCREEN;
@@ -73,11 +73,11 @@ int main() {
 
 			case NEWGAME:
 				player = rand()%2 + 1;
-				blobCount[1] = 2;
+				blobCount[1] = 2;           // blobCount contiene los puntajes de los jugadores
 				blobCount[2] = 2;
-				if(init(&board, NULL))
-					state = GAME;
-				else {
+				if(init(&board, NULL))      // Si logra inicializar el tablero, comienza el juego
+					state = GAME;           
+				else {						// de no ser asi, vuelve a MENU (donde se limpia el tablero)
 					printf("\nPresione enter para volver al menu\n");
 					while(getchar() != '\n');
 					state = MENU;
@@ -86,9 +86,9 @@ int main() {
 
 			case GAME:
 				render(&board, blobCount, player);
-				if(canMove(player, &board)) {
-					if(vsAI && player == AIPLAYER) {
-						getAImove(&command, &board);
+				if(canMove(player, &board)) {				// Analiza si hay jugadas disponibles para el jugador. Si no las hay cambia de estado a END
+					if(vsAI && player == AIPLAYER) {  		   
+						getAImove(&command, &board);		
 					}
 					else {
 						printf("Para moverse:        [f1,c1][f2,c2]\n"
@@ -114,8 +114,8 @@ int main() {
 						} while(state == GAME && !validCommand(player, &command, &board));
 					}
 					if(state == GAME) {
-						blobCount[player] += move(player, &command, &board);
-						conquer(player, &command, &board, blobCount);
+						blobCount[player] += move(player, &command, &board); //move() devuelve 1 si se divide o 0 si salta
+						conquer(player, &command, &board, blobCount);		 //Captura las manchas enemigas
 						if(player == 1)
 							player = 2;
 						else
@@ -123,7 +123,7 @@ int main() {
 					}
 				}
 				else
-					state = END;//Someone won
+					state = END;							// Termino el juego.
 				break;
 
 			case SAVE:
@@ -152,7 +152,7 @@ int main() {
 				break;
 
 			case END:
-				winner = endGame(&board, blobCount);
+				winner = endGame(&board, blobCount); // Llena el tablero con todos los movimientos restantes posibles.
 				render(&board, blobCount, 0);
 				printf("Ganó el jugador %d!\n\nPresione enter para volver al menu\n", winner);
 				while(getchar() != '\n');
