@@ -216,9 +216,9 @@ int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no 
 					return FALSE;
 				}
                 **output = 'F'; //Flag para NO salir despues de guardar
-                *output++;
+                (*output)++;
               }
-              *output[length] = input;
+              (*output)[length] = input;
               length++;
               valid = TRUE;
             }
@@ -254,39 +254,43 @@ int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no 
 
         case CMD_RESET:
           //Vacia el buffer
-		  
           break;
       }
     }
 
     if(!valid) {
       printf("Comando Inválido\n");
-      free(*output);
+	  if(*output != NULL) {
+		  if(**output == EOF)
+			free(*output);
+		  else
+			free((*output)-1);
+	  }
     }
   }
 
-  if(*output != NULL && **output == EOF) {
+  if(*output != NULL && **output == EOF) { //Si el usuario quiere salir
     printf("¿Desea guardar antes de salir?(s/n): ");
     valid = FALSE;
     while(!valid) {
       input = getchar();
       if(getchar() == '\n') {
         if(input == 's') {
-          char *aux = (char*) realloc(*output, 102*sizeof(char)); //Extra space for \0 && quit command
-		  if(aux == NULL) {
+          char *aux = (char*) realloc(*output, 102*sizeof(char)); //2 espacios extra, uno para el final del string y
+		  if(aux == NULL) {                                       //otro para el caracter escondido
 			 printf("No hay suficiente espacio en el Heap\n");
 			free(*output);
 			return FALSE;
 		  }
 		  else
 			*output = aux;
-          **output = 'T'; //True
-          *output++;
+          **output = 'T'; //Flag para salir despues de guardar
+          (*output)++;
           while(!valid) {
             printf("Ingrese un nombre para el archivo (máximo 100 caracteres): ");
             length = 0;
             while((input = getchar()) != '\n' && length < 100) {
-              *output[length] = input;
+              (*output)[length] = input;
               length++;
             }
             if(input == '\n')
@@ -309,7 +313,7 @@ int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no 
   }
 
   if(*output != NULL && **output != EOF)
-    *output[length] = '\0';
+    (*output)[length] = '\0';
 
   return TRUE;
 }
