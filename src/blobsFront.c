@@ -10,7 +10,6 @@
 	#define POINTS2 "J2"
 	#define PLAYER1 "Jugador1"
 	#define PLAYER2 "Jugador2"
-	#define CLEAR_SCREEN system("cls")
 #else
 	#define BLOB1 "\x1b[36;1mO\x1b[0m" //Blue
 	#define BLOB2 "\x1b[31;1mO\x1b[0m" //Red
@@ -18,7 +17,6 @@
 	#define POINTS2 "\x1b[31;1mJ2\x1b[0m"
 	#define PLAYER1 "\x1b[36;1mJugador1\x1b[0m"
 	#define PLAYER2 "\x1b[31;1mJugador2\x1b[0m"
-	#define CLEAR_SCREEN system("clear")
 #endif
 
 int main() {
@@ -45,7 +43,6 @@ int main() {
 				vsAI = FALSE;              // Y las variables
 				input = 0;
 
-				CLEAR_SCREEN;
 				printf("=====Bienvenido al juego Guerra de Manchas (Blob Wars)=====\n"
 						"\t1. Juego de dos jugadores\n"
 						"\t2. Juego contra computadora\n"
@@ -77,7 +74,7 @@ int main() {
 				blobCount[2] = 2;
 				if(init(&board, NULL))      // Si logra inicializar el tablero, comienza el juego
 					state = GAME;           
-				else {						// de no ser asi, vuelve a MENU (donde se limpia el tablero)
+				else {						// De no ser asi, vuelve a MENU (donde se limpia el tablero)
 					printf("\nPresione enter para volver al menu\n");
 					while(getchar() != '\n');
 					state = MENU;
@@ -95,11 +92,11 @@ int main() {
 									 "Para guardar:        save nombreDelArchivo\n"
 									 "Para volver al menu: quit\n");
 						do {
-							if(getCommand(&command, &retValue)) {
-								if(retValue != NULL) {
-									if(*retValue == EOF) //PLAYER QUIT
+							if(getCommand(&command, &retValue)) {  // 
+								if(retValue != NULL) {   // retValue vale NULL cuando el usuario ingresa un comando
+									if(*retValue == EOF) // El usuario ingreso quit
 										state = MENU;
-									else {
+									else {				// El usuario ingreso save
 										state = SAVE;
 										filename = retValue;
 									}
@@ -123,7 +120,7 @@ int main() {
 					}
 				}
 				else
-					state = END;							// Termino el juego.
+					state = END;							// Termino el juego
 				break;
 
 			case SAVE:
@@ -139,7 +136,6 @@ int main() {
 				break;
 
 			case LOAD:
-				CLEAR_SCREEN;
 				filename = getFilename();
 				char *loadedArray = NULL;
 				if(load(filename, &vsAI, &player, blobCount, &board, &loadedArray) && init(&board, loadedArray))
@@ -152,7 +148,7 @@ int main() {
 				break;
 
 			case END:
-				winner = endGame(&board, blobCount); // Llena el tablero con todos los movimientos restantes posibles.
+				winner = endGame(&board, blobCount); // Completa el tablero con los movimientos disponibles y devuelve el ganador
 				render(&board, blobCount, 0);
 				printf("Ganó el jugador %d!\n\nPresione enter para volver al menu\n", winner);
 				while(getchar() != '\n');
@@ -166,21 +162,20 @@ int main() {
 
 void render(typeBoard* board, const int blobCount[],int player){
 	int i, j, scrWidth, space;
+														//	 ┌> blobCount[1]    ┌> blobCount[2]		
+	scrWidth = board->w*2 + 7;                          //J1:2|<---space--->|J2:2//
+														// 						 //
+	printf(POINTS1":%d", blobCount[1]);					//	  |A| | | | | |Z|	 //
+														//	  | | | | | | | |	 //
+	space = scrWidth - 8;								//	  | | | | | | | |	 //
+	if(blobCount[1] > 10)								//	  | | | | | | | |	 //
+		space--;										//	  |A| | | | | |Z|	 //
+	if(blobCount[2] > 10)								//						 //
+		space--;										//|<┬>|Turno:Jugador 1	 //
+														//  └> space			 // 
+	for(i = 0; i < space; i++)							//						 //
+		putchar(' ');									//|<------scrWidth----->|//
 
-  CLEAR_SCREEN;
-
-	scrWidth = board->w*2 + 7;
-
-	printf(POINTS1":%d", blobCount[1]);
-
-	space = scrWidth - 8;
-	if(blobCount[1] > 10)
-		space--;
-	if(blobCount[2] > 10)
-		space--;
-
-	for(i = 0; i < space; i++)
-		putchar(' ');
 
   printf(POINTS2":%d\n\n", blobCount[2]);
 
@@ -188,7 +183,7 @@ void render(typeBoard* board, const int blobCount[],int player){
 		printf("   ");
     for(j = 0; j < board->w; j++)
     {
-      switch(board->get[i][j].owner){
+      switch(board->get[i][j].owner){  //owner == 	0:Vacio 1:Mancha Jugador1 2:Mancha Jugador2
 
         case 0:
           printf("| ");
@@ -207,7 +202,7 @@ void render(typeBoard* board, const int blobCount[],int player){
   }
 
 	putchar('\n');
-	space = (scrWidth - 15)/2;
+	space = (scrWidth - 15)/2; //se redefine space
 	for(i = 0; i < space; i++)
 		putchar(' ');
 
