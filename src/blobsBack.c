@@ -6,41 +6,115 @@
 typedef enum {CMD_START, CMD_MOVE, CMD_SAVE, CMD_QUIT, CMD_RESET} getCmdState;
 typedef enum {EAT, MOVE} mapType;
 
-int init(typeBoard *board, char *loadedArray) {
+
+void generate(typeBoard * board){              // Genera el tablero estándar
+ int i,j;
+ for( i = 0 ; i < board->h; i++){
+  for( j = 0 ; j < board->w ; j++){
+    if ( j == 0 && (i == 0 || i == board->h-1)){
+      board->get[i][j].owner = 1;
+    }
+    else if ( j == board->w-1 && (i == 0 || i == board->h-1)){
+      board->get[i][j].owner = 2;
+    }
+    else
+      board->get[i][j].owner = 0;
+    }
+  }
+}
+
+void initMaps(typeBoard *board){                               // initMaps crea el mapa canMove y el mapa canEat para despues analizar 
+                                                               // la cantidad de movimientos restantes y los mejores movimientos para
+  int i, j, k, l, minX, minY, maxX, maxY;                      // la computadora
+                                                               // minX, minY, maxX, maxY van a limitarse a los bordes del tablero
+  for(i = 0 ; i < board->h ; i++){                             
+    for(j = 0 ; j < board->w ; j++){                           
+      
+        minY=i-2;                   // Se definen los limites en un radio de 2 celdas al rededor del centro
+        minX=j-2;
+        maxY=i+2;
+        maxX=j+2;
+
+        if( minY < 0 )             // Si estas variables se encuentran afuera de las dimensiones del tablero, se ajustan acorde a lo necesario
+          minY = 0;
+
+        if( maxY > board->h-1 )
+          maxY = board->h-1;
+
+        if( minX < 0)
+          minX = 0;
+
+        if( maxX > board->w-1 )
+          maxX = board->w-1;
+
+        board->get[i][j].canMove = 0;   
+        board->get[i][j].canEat = 0;    
+
+        for(k = minY; k <= maxY; k++ ){  
+          for(l = minX; l <= maxX; l++){
+
+            if(board->get[k][l].owner == 0){                                             // Se calcula canMove en un radio de 2 celdas
+              board->get[i][j].canMove++;
+            }
+            else if((board->get[k][l].owner == 1) && (abs(i-k) < 2 && abs(j-l) < 2) )   // Se calcula canEat en un radio de 1 celda
+              board->get[i][j].canEat++;                                              
+          }
+        }
+
+        if(board->get[i][j].owner == 0)  // Se le resta 1 al valor de canMove porque se cuenta 1 de más
+        board->get[i][j].canMove--;
+        if(board->get[i][j].owner == 1)  // Se le resta 1 al valor de canEat porque se cuenta 1 de más
+        board->get[i][j].canEat--;
+      }
+    }
+
+  
+  //   Mapa            //   Mapa canMove           //   Mapa canEat     //
+  //                   //                          //                   //
+  //  |A| | | | | |Z|  //  | 8|10|13|14|13|10| 8|  //  |0|1|0|0|0|0|0|  //
+  //  | | | | | | | |  //  |10|14|18|19|18|14|10|  //  |1|1|0|0|0|0|0|  //
+  //  | | | | | | | |  //  |12|17|22|24|22|17|12|  //  |0|0|0|0|0|0|0|  //
+  //  | | | | | | | |  //  |10|14|18|19|18|14|10|  //  |1|1|0|0|0|0|0|  //
+  //  |A| | | | | |Z|  //  | 8|10|13|14|13|10| 8|  //  |0|1|0|0|0|0|0|  //
+  //                   //                          //                   //
+ 
+}
+
+int init(typeBoard *board, char *loadedArray) {                                 // Retorna falso si se produce un error
 
   typeBlob *temp;
-  int i, j, k, l, minX, minY, maxX, maxY;
+  int i, j;
 
   if(loadedArray == NULL) {
     do {
-      board->h = getint("\nIngrese la cantidad de filas(Entre 5 y 30): ");
+      board->h = getInt("\nIngrese la cantidad de filas(Entre 5 y 30): ");     
     } while(board->h < 5 || board->h > 30);
     do {
-      board->w = getint("\nIngrese la cantidad de columnas(Entre 5 y 30): ");
+      board->w = getInt("\nIngrese la cantidad de columnas(Entre 5 y 30): ");
     } while(board->w < 5 || board->w > 30);
   }
 
-  if((board->get = (typeBlob**) malloc(board->h * sizeof(typeBlob*))) == NULL){
+  if((board->get = (typeBlob**) malloc(board->h * sizeof(typeBlob*))) == NULL){  // Crea un vector dinamico con la dimension de la altura
     printf("No hay suficiente espacio en el Heap\n");
     return FALSE;
   }
 
-  if((temp = (typeBlob*) malloc(board->h * board->w * sizeof(typeBlob))) == NULL)
+  if((temp = (typeBlob*) malloc(board->h * board->w * sizeof(typeBlob))) == NULL) // Crea un bloque en el heap del tamaño del tablero
   {
     printf("No hay suficiente espacio en el Heap\n");
     free(board->get);
     return FALSE;
   }
 
-  for (i = 0; i < board->h; i++) {
-    board->get[i] = temp + (i * board->w);
-  }
+  for (i = 0; i < board->h; i++) {    // Divide el bloque en filas y guarda su dirección en la posición correspondiente del primer vector
+      board->get[i] = temp + (i * board->w);
+    }
 
 
-  if(loadedArray == NULL) {
-    fill(board);
+  if(loadedArray == NULL) {           // En caso de que no se haya cargado ningun tablero, genera el tablero estándar
+    generate(board);
   }
-  else {
+  else {                              // El otro caso es que se cargó un tablero de tipo char y hay que guardarlo al tipo typeBoard
     for(i = 0 ; i < board->h ; i++) {
       for(j = 0 ; j < board->w ; j++) {
         switch(loadedArray[(i*board->w)+j]) {
@@ -66,66 +140,10 @@ int init(typeBoard *board, char *loadedArray) {
     }
     free(loadedArray);
   }
+  
+  initMaps(board);                   //  Calcula el mapa de movimientos y el mapa canEat
 
-
-  for(i = 0 ; i < board->h ; i++){
-    for(j = 0 ; j < board->w ; j++){
-      {
-        minY=i-2;
-        minX=j-2;
-        maxY=i+2;
-        maxX=j+2;
-
-        if( minY < 0 )
-          minY = 0;
-
-        if( maxY > board->h-1 )
-          maxY = board->h-1;
-
-        if( minX < 0)
-          minX = 0;
-
-        if( maxX > board->w-1 )
-          maxX = board->w-1;
-        board->get[i][j].canMove = 0;
-        board->get[i][j].canEat = 0;
-
-        for(k = minY; k <= maxY; k++ ){
-          for(l = minX; l <= maxX; l++){
-
-            if(board->get[k][l].owner == 0){
-              board->get[i][j].canMove++;
-            }
-            else if((board->get[k][l].owner == 1) && (abs(i-k) < 2 && abs(j-l) < 2) )
-              board->get[i][j].canEat++;
-          }
-        }
-
-        if(board->get[i][j].owner == 0)
-        board->get[i][j].canMove--;
-        if(board->get[i][j].owner == 1)
-        board->get[i][j].canEat--;
-      }
-    }
-
-  }
   return TRUE;
-}
-
-void fill(typeBoard * board){ //prueba para el switch
- int i,j;
- for( i = 0 ; i < board->h; i++){
-  for( j = 0 ; j < board->w ; j++){
-    if ( j == 0 && (i == 0 || i == board->h-1)){
-      board->get[i][j].owner = 1;
-    }
-    else if ( j == board->w-1 && (i == 0 || i == board->h-1)){
-      board->get[i][j].owner = 2;
-    }
-    else
-      board->get[i][j].owner = 0;
-    }
-  }
 }
 
 int canMove(int player, typeBoard *board) { //Busca si alguno de los blobs del jugador se puede mover
@@ -651,7 +669,7 @@ int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *boa
   return result;
 }
 
-int getint(char *message) {
+int getInt(char *message) {
   char input, output, valid = FALSE;
   while(!valid) {
     output = 0;

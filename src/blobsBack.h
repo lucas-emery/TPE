@@ -32,14 +32,22 @@
   } typeBoard;
 
   int canMove(int player, typeBoard *board);
+  // 
   void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]);
+  // 
   int endGame(typeBoard *board, int blobCount[], int player);
-  void fill(typeBoard *board);
+  // 
+  void generate(typeBoard *board);
+  // Genera el tablero estándar
   void getAImove(typeCommand *command, typeBoard *board);
+  //
   int getCommand(typeCommand *command, char **output);
+  //
   int getFilename(char **filename);
   int getint(char *message);
   int init(typeBoard *board, char *loadedArray);
+  // Devuelve
+  void initMaps(typeBoard *board);
   int isInside(int x, int y, int w, int h); //Just for the record
   int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *board, char **loadedArray);
   int move(int player, typeCommand *command, typeBoard *board);

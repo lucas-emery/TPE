@@ -49,7 +49,7 @@ int main() {
         				"\t3. Recuperar un juego guardado\n"
            				"\t4. Terminar\n");
 				do {
-					input = getint("\nElegir opción: ");
+					input = getInt("\nElegir opción: ");
 
 					if(input == 1)
 						state = NEWGAME;
@@ -92,8 +92,8 @@ int main() {
 									 "Para guardar:        save nombreDelArchivo\n"
 									 "Para volver al menu: quit\n");
 						do {
-							if(getCommand(&command, &retValue)) {  // 
-								if(retValue != NULL) {   // retValue vale NULL cuando el usuario ingresa un comando
+							if(getCommand(&command, &retValue)) {
+								if(retValue != NULL) {   // retValue vale NULL cuando el usuario ingresa un movimiento
 									if(*retValue == EOF) // El usuario ingreso quit
 										state = MENU;
 									else {				// El usuario ingreso save
