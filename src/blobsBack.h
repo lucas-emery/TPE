@@ -37,7 +37,7 @@
   void fill(typeBoard *board);
   void getAImove(typeCommand *command, typeBoard *board);
   int getCommand(typeCommand *command, char **output);
-  char* getFilename();
+  int getFilename(char **filename);
   int getint(char *message);
   int init(typeBoard *board, char *loadedArray);
   int isInside(int x, int y, int w, int h); //Just for the record

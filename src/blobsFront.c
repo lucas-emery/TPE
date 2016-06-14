@@ -28,7 +28,7 @@ int main() {
 	gameState state = MENU;
 	typeCommand command;
 	int vsAI, input, player, winner;
-	char *filename, *retValue;
+	char *filename, *retValue, *loadedArray = NULL;
 	srand(time(NULL));
 
 	while(state != QUIT) {
@@ -136,9 +136,7 @@ int main() {
 				break;
 
 			case LOAD:
-				filename = getFilename();
-				char *loadedArray = NULL;
-				if(load(filename, &vsAI, &player, blobCount, &board, &loadedArray) && init(&board, loadedArray))
+				if(getFilename(&filename) && load(filename, &vsAI, &player, blobCount, &board, &loadedArray) && init(&board, loadedArray))
 					state = GAME;
 				else {
 					printf("\nPresione enter para volver al menu\n");

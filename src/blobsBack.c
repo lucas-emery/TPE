@@ -274,7 +274,7 @@ int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no 
     valid = FALSE;
     while(!valid) {
       input = getchar();
-      if(getchar() == '\n') {
+      if(getchar() == '\n') { //si ingresó solo un caracter
         if(input == 's') {
           char *aux = (char*) realloc(*output, 102*sizeof(char)); //2 espacios extra, uno para el final del string y
 		  if(aux == NULL) {                                       //otro para el caracter escondido
@@ -297,7 +297,7 @@ int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no 
               valid = TRUE;
             else {
               printf("¡El nombre es demasiado largo!\n");
-              while(getchar() != '\n'); //EMPTY BUFFER
+              while(getchar() != '\n'); //Vacia el buffer
             }
           }
         }
@@ -305,7 +305,7 @@ int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no 
           valid = TRUE;
       }
       else
-        while(getchar() != '\n');//EMPTY BUFFER
+        while(getchar() != '\n');//Vacia el buffer
 
       if(!valid)
         printf("Respuesta inválida, ingrese s para sí o n para no: ");
@@ -350,13 +350,12 @@ int validCommand(int player, typeCommand *command, typeBoard *board) {
     return TRUE;
 }
 
-//Action must be INCREMENT or DECREMENT
-void updateMap(typeCoord center, typeBoard *board, mapType type, int action) {
-  int minX, maxX, minY, maxY, radius;
-  size_t offset;
+void updateMap(typeCoord center, typeBoard *board, mapType type, int action) {	//Realiza la accion especificada a todos los blobs
+  int minX, maxX, minY, maxY, radius;                                           //alrededor del centro en el radio correspondiente
+  size_t offset;                                                                //al mapa que se esta actualizando
 
-  if(type == EAT) {
-    radius = 1;
+  if(type == EAT) {                                                             //Estos mapas reducen significativamente el tiempo de 
+    radius = 1;                                                                 //cálculo de la IA
     offset = offsetof(typeBlob, canEat);
   }
   else {
@@ -381,24 +380,23 @@ void updateMap(typeCoord center, typeBoard *board, mapType type, int action) {
   int i, j;
   for(i = minY; i <= maxY; i++) {
     for(j = minX; j <= maxX; j++) {
-      *((int*)(((size_t)&board->get[i][j])+offset)) += action; //Equals typeBlob.canEat or typeBlob.canMove
+      *((int*)(((size_t)&board->get[i][j])+offset)) += action; //Equivale a board->get[i][j].canEat o board->get[i][j].canMove
     }
   }
 
-  //Correct outside loop to halve comparisons
-  *((int*)(((size_t)&board->get[center.y][center.x])+offset)) -= action; //Equals typeBlob.canEat or typeBlob.canMove
+  *((int*)(((size_t)&board->get[center.y][center.x])+offset)) -= action; //Se corrige afuera del loop para reducir las comparaciones
 }
 
-int move(int player, typeCommand *command, typeBoard *board) {
-  board->get[command->target.y][command->target.x].owner = player;
-  updateMap(command->target, board, MOVE, DECREMENT);
+int move(int player, typeCommand *command, typeBoard *board) {		//Retorna verdadero si el blob se dividio
+  board->get[command->target.y][command->target.x].owner = player;	//el espacio al que se mueve ahora es del jugador
+  updateMap(command->target, board, MOVE, DECREMENT);		//actualiza el mapa de movimiento, indicando que este espacio ya no esta disponible
   if(player != AIPLAYER)
-    updateMap(command->target, board, EAT, INCREMENT);
+    updateMap(command->target, board, EAT, INCREMENT);		//Si es enemigo de la IA, indica a los espacios adyacentes que pueden comer uno más
   if(abs(command->source.x - command->target.x) == 2 || abs(command->source.y - command->target.y) == 2) {
-    board->get[command->source.y][command->source.x].owner = 0;
-    updateMap(command->source, board, MOVE, INCREMENT);
+    board->get[command->source.y][command->source.x].owner = 0;		//Si el movimiento es un salto, libera la celda inicial
+    updateMap(command->source, board, MOVE, INCREMENT);				//Y avisa que esta disponible
     if(player != AIPLAYER)
-      updateMap(command->source, board, EAT, DECREMENT);
+      updateMap(command->source, board, EAT, DECREMENT);		//Si es enemigo de la IA, avisa que ya no esta ahi en el eatMap
     return FALSE;
   }
   return TRUE;
@@ -429,9 +427,9 @@ void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]
   int i, j, action;
   for(i = minY; i <= maxY; i++) {
     for(j = minX; j <= maxX; j++) {
-      if(board->get[i][j].owner == otherPlayer) {
-        board->get[i][j].owner = player;
-        blobCount[player]++;
+      if(board->get[i][j].owner == otherPlayer) {	//Si las piezas que estan alrededor son del otro jugador
+        board->get[i][j].owner = player;			//Las convierte
+        blobCount[player]++;						//Y corrige los puntajes de los jugadores
         blobCount[otherPlayer]--;
 
         if(player == AIPLAYER)
@@ -441,7 +439,7 @@ void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]
 
         coord.y = i;
         coord.x = j;
-        updateMap(coord, board, EAT, action);
+        updateMap(coord, board, EAT, action);		//Corrige el eatMap dependiendo de si comió la IA o el jugador
       }
     }
   }
@@ -454,7 +452,7 @@ void getAImove(typeCommand *command, typeBoard *board) {
 
   for(i = 0; i < board->h; i++) {
     for(j = 0; j < board->w; j++) {
-      if(board->get[i][j].owner == AIPLAYER && board->get[i][j].canMove) {
+      if(board->get[i][j].owner == AIPLAYER && board->get[i][j].canMove) {		//Recorre el tablero buscando blobs de la IA que se puedan mover
         minY = i - 2;
         maxY = i + 2;
         minX = j - 2;
@@ -471,17 +469,17 @@ void getAImove(typeCommand *command, typeBoard *board) {
 
         for(k = minY; k <= maxY; k++) {
           for(l = minX; l <= maxX; l++) {
-            if(board->get[k][l].owner == 0) {
+            if(board->get[k][l].owner == 0) {		//Busca posiciones vacias a las que puede moverse
               override = FALSE;
               isMitosis = FALSE;
-              if(board->get[k][l].canEat > bestScore) {
+              if(board->get[k][l].canEat > bestScore) {		//Si come mas en la nueva posicion que en la mejor que tiene guardada, las cambia
                 override = TRUE;
                 sameScoreMoves = 1;
                 if(abs(i - k) == 1 && abs(j - l) == 1)
-                  isMitosis = TRUE;
-              }
+                  isMitosis = TRUE;							//Chequea si es un movimiento de division, estos se consideran mejores que
+              }                                             //los saltos porque ademas de lo que comen dejan un blob extra
               else if(board->get[k][l].canEat == bestScore) {
-                if(abs(i - k) == 1 && abs(j - l) == 1)
+                if(abs(i - k) == 1 && abs(j - l) == 1)		//Si el nuevo movimiento come lo mismo que le mejor guardado
                   isMitosis = TRUE;
                 if(!isBMmitosis && isMitosis) {
                   override = TRUE;
@@ -530,33 +528,36 @@ int endGame(typeBoard *board, int blobCount[]) {
   return winner;
 }
 
-char* getFilename() {
-  char *filename = malloc(16 * sizeof(char));
+int getFilename(char **filename) {
+  if((*filename = malloc(101 * sizeof(char))) == NULL) {
+	printf("No hay suficiente espacio en el Heap\n");
+	return FALSE;
+  }
   int length, valid = FALSE;
   char input;
 
   while(!valid) {
-    printf("Ingrese el nombre del archivo (máximo 15 caracteres): ");
+    printf("Ingrese el nombre del archivo (máximo 100 caracteres): ");
     length = 0;
-    while((input = getchar()) != '\n' && length < 15) {
-      filename[length] = input;
+    while((input = getchar()) != '\n' && length < 100) {
+      (*filename)[length] = input;
       length++;
     }
     if(input == '\n')
       valid = TRUE;
     else {
       printf("¡El nombre es demasiado largo!\n\n");
-      while(getchar() != '\n'); //EMPTY BUFFER
+      while(getchar() != '\n'); //Vacía el buffer
     }
   }
-  filename[length] = '\0';
+  (*filename)[length] = '\0';
 
-  return filename;
+  return TRUE;
 }
 
 int save(char *filename, int vsAI, int player, int blobCount[], typeBoard *board){
   int i, j, result = FALSE;
-	FILE *file;
+  FILE *file;
   char *boardBuffer;
   int dataBuffer[6] = {vsAI, player, board->h, board->w, blobCount[1], blobCount[2]};
 
