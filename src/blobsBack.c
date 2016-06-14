@@ -264,7 +264,7 @@ int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no 
 		  if(**output == EOF)
 			free(*output);
 		  else
-			free((*output)-1);
+			free((*output)-1); //Si estaba tratando de guardar output tiene el caracter escondido
 	  }
     }
   }
@@ -293,7 +293,7 @@ int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no 
               (*output)[length] = input;
               length++;
             }
-            if(input == '\n')
+            if(input == '\n')	//Si el input quedo en \n significa que entraron 100 o menos caracteres
               valid = TRUE;
             else {
               printf("¡El nombre es demasiado largo!\n");
@@ -313,7 +313,7 @@ int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no 
   }
 
   if(*output != NULL && **output != EOF)
-    (*output)[length] = '\0';
+    (*output)[length] = '\0';	//Cierra el string
 
   return TRUE;
 }
@@ -458,7 +458,7 @@ void getAImove(typeCommand *command, typeBoard *board) {
         minX = j - 2;
         maxX = j + 2;
 
-        if(minY < 0)
+        if(minY < 0)			//Ajusta los min y los max para que no salgan del tablero
           minY = 0;
         else if(maxY >= board->h)
           maxY = board->h - 1;
@@ -469,7 +469,7 @@ void getAImove(typeCommand *command, typeBoard *board) {
 
         for(k = minY; k <= maxY; k++) {
           for(l = minX; l <= maxX; l++) {
-            if(board->get[k][l].owner == 0) {		//Busca posiciones vacias a las que puede moverse
+            if(board->get[k][l].owner == 0) {		//Busca posiciones vacias a las que puede moverse en un radio de 2
               override = FALSE;
               isMitosis = FALSE;
               if(board->get[k][l].canEat > bestScore) {		//Si come mas en la nueva posicion que en la mejor que tiene guardada, las cambia
@@ -479,21 +479,21 @@ void getAImove(typeCommand *command, typeBoard *board) {
                   isMitosis = TRUE;							//Chequea si es un movimiento de division, estos se consideran mejores que
               }                                             //los saltos porque ademas de lo que comen dejan un blob extra
               else if(board->get[k][l].canEat == bestScore) {
-                if(abs(i - k) == 1 && abs(j - l) == 1)		//Si el nuevo movimiento come lo mismo que le mejor guardado
-                  isMitosis = TRUE;
-                if(!isBMmitosis && isMitosis) {
+                if(abs(i - k) == 1 && abs(j - l) == 1)		//Si el nuevo movimiento come lo mismo que le mejor guardado y
+                  isMitosis = TRUE;							//el nuevo es mitosis pero el guardado no, el nuevo es mejor entonces se reemplaza
+                if(!isBMmitosis && isMitosis) {				//el guardado.
                   override = TRUE;
                   sameScoreMoves = 1;
                 }
-                else if(isMitosis == isBMmitosis) {
-                  sameScoreMoves++;
-                  if(rand()%sameScoreMoves == 0)
-                    override = TRUE;
+                else if(isMitosis == isBMmitosis) {			//Si los dos son del mismo tipo, se elige aleatoriamente cual se guarda
+                  sameScoreMoves++;							//A medida que se van encontrando mas movimientos con el mismo puntaje
+                  if(rand()%sameScoreMoves == 0)			//Va disminuyendo la probabilidad de que reemplacen el guardado.
+                    override = TRUE;						//Esto es para que las primeras tengan las mismas chances que las ultimas
                 }
               }
 
               if(override) {
-                bestMove.source.y = i;
+                bestMove.source.y = i;						//Aqui se reemplaza el movimiento guardado por el nuevo
                 bestMove.source.x = j;
                 bestMove.target.y = k;
                 bestMove.target.x = l;
@@ -509,22 +509,27 @@ void getAImove(typeCommand *command, typeBoard *board) {
   *command = bestMove;
 }
 
-int endGame(typeBoard *board, int blobCount[]) {
-  int winner;
-  if(blobCount[1] > blobCount[2])
+int endGame(typeBoard *board, int blobCount[], int player) {
+  int i, j, otherPlayer, winner;
+  if(player == 1)			//Player es el jugador que no se puede mover
+    otherPlayer = 2;
+  else
+    otherPlayer = 1;
+
+  for(i = 0; i < board->h; i++) {
+    for(j = 0; j < board->w; j++) {
+      if(board->get[i][j].owner == 0) {		//Se le asignan todos los espacios vacios al otro jugador
+        board->get[i][j].owner = otherPlayer;
+        blobCount[otherPlayer]++;
+      }
+    }
+  }
+  
+  if(blobCount[1] > blobCount[2])		//Se calcula el ganador
     winner = 1;
   else
     winner = 2;
 
-  int i, j;
-  for(i = 0; i < board->h; i++) {
-    for(j = 0; j < board->w; j++) {
-      if(board->get[i][j].owner == 0) {
-        board->get[i][j].owner = winner;
-        blobCount[winner]++;
-      }
-    }
-  }
   return winner;
 }
 
@@ -543,14 +548,14 @@ int getFilename(char **filename) {
       (*filename)[length] = input;
       length++;
     }
-    if(input == '\n')
+    if(input == '\n')	//Si el input quedo en \n significa que entraron 100 o menos caracteres
       valid = TRUE;
     else {
       printf("¡El nombre es demasiado largo!\n\n");
       while(getchar() != '\n'); //Vacía el buffer
     }
   }
-  (*filename)[length] = '\0';
+  (*filename)[length] = '\0'; //Cierra el string
 
   return TRUE;
 }
@@ -575,8 +580,8 @@ int save(char *filename, int vsAI, int player, int blobCount[], typeBoard *board
       else {
         for(i = 0; i < board->h; i++) {
           for(j = 0; j < board->w; j++) {
-            switch(board->get[i][j].owner) {
-              case 0:
+            switch(board->get[i][j].owner) {		//Se convierte el tablero a chars y se lo guarda en un buffer,
+              case 0:								//Lo que facilita y agiliza la operacion de guardado
                 boardBuffer[(i*board->w)+j] = '0';
                 break;
               case 1:
@@ -642,7 +647,7 @@ int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *boa
 		if(fclose(file) == EOF)
 			printf("Error al intentar cerrar el archivo\n");
 	}
-  free(filename);
+	free(filename);
 	return result;
 }
 

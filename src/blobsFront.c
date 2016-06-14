@@ -146,7 +146,7 @@ int main() {
 				break;
 
 			case END:
-				winner = endGame(&board, blobCount); // Completa el tablero con los movimientos disponibles y devuelve el ganador
+				winner = endGame(&board, blobCount, player); // Completa el tablero con los movimientos disponibles y devuelve el ganador
 				render(&board, blobCount, 0);
 				printf("Ganó el jugador %d!\n\nPresione enter para volver al menu\n", winner);
 				while(getchar() != '\n');

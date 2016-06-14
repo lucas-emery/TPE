@@ -33,7 +33,7 @@
 
   int canMove(int player, typeBoard *board);
   void conquer(int player, typeCommand *command, typeBoard *board, int blobCount[]);
-  int endGame(typeBoard *board, int blobCount[]);
+  int endGame(typeBoard *board, int blobCount[], int player);
   void fill(typeBoard *board);
   void getAImove(typeCommand *command, typeBoard *board);
   int getCommand(typeCommand *command, char **output);
