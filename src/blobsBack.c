@@ -212,8 +212,8 @@ int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no 
             if(length < 100) { //Largo máximo arbitrario
               if(*output == NULL) {
                 if((*output = (char*) malloc(102*sizeof(char))) == NULL) { //2 espacios extra, uno para el final del string y
-					printf("No hay suficiente espacio en el Heap\n");      //otro para el caracter escondido
-					return FALSE;
+				  printf("No hay suficiente espacio en el Heap\n");      //otro para el caracter escondido
+				  return FALSE;
 				}
                 **output = 'F'; //Flag para NO salir despues de guardar
                 (*output)++;
@@ -239,9 +239,9 @@ int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no 
             i++;
             if(pattern[i] == '\0') { //Cuando llego al final del patron, el comando es valido
               if((*output = (char*) malloc(sizeof(char))) == NULL) {
-					printf("No hay suficiente espacio en el Heap\n");
-					return FALSE;
-				}
+				printf("No hay suficiente espacio en el Heap\n");
+				return FALSE;
+			  }
               **output = EOF;		//EOF se utiliza para señalizar que el usuario quiere salir
               valid = TRUE;
             }
@@ -261,10 +261,10 @@ int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no 
     if(!valid) {
       printf("Comando Inválido\n");
 	  if(*output != NULL) {
-		  if(**output == EOF)
-			free(*output);
-		  else
-			free((*output)-1); //Si estaba tratando de guardar output tiene el caracter escondido
+		if(**output == EOF)
+		  free(*output);
+		else
+		  free((*output)-1); //Si estaba tratando de guardar output tiene el caracter escondido
 	  }
     }
   }
@@ -278,7 +278,7 @@ int getCommand(typeCommand *command, char **output) { //Retorna verdadero si no 
         if(input == 's') {
           char *aux = (char*) realloc(*output, 102*sizeof(char)); //2 espacios extra, uno para el final del string y
 		  if(aux == NULL) {                                       //otro para el caracter escondido
-			 printf("No hay suficiente espacio en el Heap\n");
+			printf("No hay suficiente espacio en el Heap\n");
 			free(*output);
 			return FALSE;
 		  }
@@ -571,7 +571,7 @@ int save(char *filename, int vsAI, int player, int blobCount[], typeBoard *board
   }
   else {
     if ((file = fopen(filename,"wb")) == NULL) {
-  		perror("Error al intentar crear el archivo");
+  	  perror("Error al intentar crear el archivo");
   	}
     else {
   	  if(fwrite(dataBuffer, sizeof(int), 6, file) < 6) {
@@ -601,54 +601,54 @@ int save(char *filename, int vsAI, int player, int blobCount[], typeBoard *board
         }
       }
       if(fclose(file) == EOF)
-  			printf("Error al intentar cerrar el archivo\n");
+  		printf("Error al intentar cerrar el archivo\n");
     }
     free(boardBuffer);
   }
-	return result;
+  return result;
 }
 
 int load(char *filename, int *vsAI, int *player, int blobCount[], typeBoard *board, char **loadedArray) {
-	int result = FALSE;
-	FILE *file;
+  int result = FALSE;
+  FILE *file;
 
-	if((file = fopen(filename, "rb")) == NULL) {
-		perror("Error al intentar abrir el archivo");
-	}
+  if((file = fopen(filename, "rb")) == NULL) {
+	perror("Error al intentar abrir el archivo");
+  }
+  else {
+	if(fread(vsAI, sizeof(int), 1, file) == 0)
+	  printf("Error al intentar cargar el modo de juego\n");
 	else {
-		if(fread(vsAI, sizeof(int), 1, file) == 0)
-			printf("Error al intentar cargar el modo de juego\n");
+	  if(fread(player, sizeof(int), 1, file) == 0)
+		printf("Error al intentar cargar el turno\n");
+	  else {
+		if(fread(&board->h, sizeof(int), 1, file) == 0)
+		  printf("Error al intentar cargar el alto del tablero\n");
 		else {
-			if(fread(player, sizeof(int), 1, file) == 0)
-				printf("Error al intentar cargar el turno\n");
+		  if(fread(&board->w, sizeof(int), 1, file) == 0)
+			printf("Error al intentar cargar el ancho del tablero\n");
+		  else {
+			if(fread(&blobCount[1], sizeof(int), 2, file) < 2)
+			  printf("Error al intentar cargar los puntajes\n");
 			else {
-				if(fread(&board->h, sizeof(int), 1, file) == 0)
-					printf("Error al intentar cargar el alto del tablero\n");
-				else {
-					if(fread(&board->w, sizeof(int), 1, file) == 0)
-						printf("Error al intentar cargar el ancho del tablero\n");
-					else {
-						if(fread(&blobCount[1], sizeof(int), 2, file) < 2)
-							printf("Error al intentar cargar los puntajes\n");
-						else {
-							if((*loadedArray = (char*) malloc(board->h * board->w * sizeof(char))) == NULL)
-						    printf("No hay suficiente espacio en el Heap para cargar el tablero\n");
-							else {
-									if(fread(*loadedArray, sizeof(char), board->h * board->w, file) < (board->h*board->w))
-										printf("Error al intentar cargar el tablero\n");
-									else
-										result = TRUE;
-							}
-						}
-					}
-				}
+			  if((*loadedArray = (char*) malloc(board->h * board->w * sizeof(char))) == NULL)
+				printf("No hay suficiente espacio en el Heap para cargar el tablero\n");
+			  else {
+				if(fread(*loadedArray, sizeof(char), board->h * board->w, file) < (board->h*board->w))
+				  printf("Error al intentar cargar el tablero\n");
+				else
+				  result = TRUE;
+			  }
 			}
+		  }
 		}
-		if(fclose(file) == EOF)
-			printf("Error al intentar cerrar el archivo\n");
+	  }
 	}
-	free(filename);
-	return result;
+	if(fclose(file) == EOF)
+	printf("Error al intentar cerrar el archivo\n");
+  }
+  free(filename);
+  return result;
 }
 
 int getint(char *message) {
@@ -658,12 +658,12 @@ int getint(char *message) {
     printf(message);
     while((input = getchar()) != '\n') {
       if(input >= '0' && input <= '9') {
-          output = (10*output) + (input - '0');
-          valid = TRUE;
+	    output = (10*output) + (input - '0');  //Dezplaza los digitos de output un lugar a la izquierda e inserta input
+	    valid = TRUE;
       }
       else {
         valid = FALSE;
-        while(getchar() != '\n'); //EMPTY BUFFER
+        while(getchar() != '\n'); //Vacía el buffer
         break;
       }
     }
